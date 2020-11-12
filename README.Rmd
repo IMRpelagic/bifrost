@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Bifrost
+# Bifrost package
 Sondre Hølleland, Samuel Subbey
 <!-- badges: start -->
 <!-- badges: end -->
