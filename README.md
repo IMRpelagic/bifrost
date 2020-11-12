@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# bifrost
+# Bifrost
 
 Sondre Hølleland, Samuel Subbey <!-- badges: start -->
 <!-- badges: end -->
