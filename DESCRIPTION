@@ -1,7 +1,7 @@
 Package: bifrost
 Type: Package
 Title: Capelin assessment
-Version: 0.1.0
+Version: 0.0.0.9000
 Author: 
     person("Sondre", "Holleland", email = "sondre.hoelleland@hi.no", role = c("aut","cre"))
 Maintainer: Sondre Holleland <sondre.hoelleland@hi.no>
@@ -16,4 +16,5 @@ RoxygenNote: 7.1.1
 Suggests: 
     testthat
 Imports: 
-    forcats
+    forcats,
+    TMB
