@@ -37,8 +37,8 @@ Put link to papers here.
 
 ## Licence
 
-What licence should be used? Creative commons? Some standard developers
-licence, perhaps?
+This project is licensed under the MIT licence - see
+[LICENSE.md](LICENSE.md) for details.
 
 <img src="https://www.hi.no/en/hi/resources/layout/HI-logo-farger-engelsk.svg/original"
 alt="Institute of Marine Research" width="200"/>
