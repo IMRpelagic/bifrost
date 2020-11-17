@@ -17,4 +17,6 @@ Suggests:
     testthat
 Imports: 
     forcats,
+    TMB (>= 1.7.18)
+LinkingTo: 
     TMB
