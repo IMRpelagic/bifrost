@@ -34,6 +34,8 @@ runMaturityYearByYear <- function(cap, catch, initPar, min_age = 3, max_age = 4,
     par.list <- createMaturityParameters(initPar, year  = year)
     est.list[[i]] <- estimateMaturity(data, parameters = par.list, silent = TRUE)
     est.list[[i]]$year <- year
+    est.list[[i]]$data.list <- data
+    est.list[[i]]$data <- par.list
   }
   options(warn = 0)
   # ..Structure parameter results..
@@ -58,6 +60,7 @@ runMaturityYearByYear <- function(cap, catch, initPar, min_age = 3, max_age = 4,
     ggplot2::facet_wrap(~parameter, ncol = 1, scales= "free")+
     ggplot2::theme_bw() +
     ggplot2::ylab("Parameter value")+
+    ggplot2::xlab("Year")+
     ggplot2::scale_x_continuous(expand =c(0,0))
   if(plot)
     print(p)

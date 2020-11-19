@@ -3,5 +3,7 @@
 export(createMaturityData)
 export(createMaturityParameters)
 export(estimateMaturity)
+export(maturing)
+export(plotMaturity)
 export(runMaturityYearByYear)
 useDynLib(bifrost, .registration=TRUE); useDynLib(bifrost_TMBExports)

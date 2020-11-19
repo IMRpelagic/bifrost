@@ -3,7 +3,7 @@
 
 # Bifrost package
 
-Sondre Hølleland, Samuel Subbey <!-- badges: start -->
+Sondre Hølleland, Mahmood Jokar, Samuel Subbey <!-- badges: start -->
 <!-- badges: end -->
 
 *Institute of Marine Research, Norway.*
@@ -127,6 +127,12 @@ result$plot
 ```
 
 <img src="man/figures/README-runallmaturities-1.png" width="80%" />
+
+``` r
+plotMaturity(result)
+```
+
+<img src="man/figures/README-runallmaturities-2.png" width="80%" />
 
 ## References
 

@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 # Bifrost package
-Sondre Hølleland, Samuel Subbey
+Sondre Hølleland, Mahmood Jokar, Samuel Subbey
 <!-- badges: start -->
 <!-- badges: end -->
 
@@ -87,6 +87,7 @@ You can also run all years sequentially using the following function:
 result <- runMaturityYearByYear(cap = cap, catch = catch, initPar = maturityInitialParameters,
                                 min_age = 3, max_age = 4, plot = FALSE)
 result$plot
+plotMaturity(result)
 ```
 
 ## References
