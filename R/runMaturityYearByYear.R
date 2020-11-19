@@ -47,15 +47,18 @@ runMaturityYearByYear <- function(cap, catch, initPar, min_age = 3, max_age = 4,
     est.pars[k, 1:3] <- (est.pars[k-1,1:3]+est.pars[k+1,1:3])/2
     est.pars[k, 5:7] <- sqrt((est.pars[k-1,5:7]^2+est.pars[k+1,5:7]^2)/4)
   }
+  est.pars <- tibble::as_tibble(est.pars)
   # ..Plot..
   p <- ggplot2::ggplot(tidyr::pivot_longer(est.pars,
                                            cols = c("p1","p2","p3"),
                                            names_to = "parameter",
                                            values_to = "value"),
                   ggplot2::aes(x = year, y = value)) +
-    ggplot2::geom_line() +
+    ggplot2::geom_line(col = "blue", lwd = .9) +
     ggplot2::facet_wrap(~parameter, ncol = 1, scales= "free")+
-    ggplot2::theme_bw() + ggplot2::ylab("Parameter value")
+    ggplot2::theme_bw() +
+    ggplot2::ylab("Parameter value")+
+    ggplot2::scale_x_continuous(expand =c(0,0))
   if(plot)
     print(p)
   # ..Structure return  list..

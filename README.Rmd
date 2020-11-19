@@ -7,9 +7,12 @@ output: github_document
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  cache = FALSE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "80%",
+  fig.height = 6,
+  warning = FALSE
 )
 ```
 
@@ -33,6 +36,13 @@ alt="Capelin image" width="600"/>
 
 Capelin from the Barent Sea. Source: hi.no,  Photographer: Jan de Lange / Institute of Marine Research
 
+## Plan of development 
+
+- [x] Maturity 
+- [ ] Bifrost
+- [ ] Monte Carlo Simulation
+
+
 ## Install package
 
 To install the package, run the following code: 
@@ -43,9 +53,50 @@ install_github("holleland/bifrost")
 ```
 The package uses **TMB** (Template model builder). 
 
+## Maturity 
+Here is an example to play with if you want to estimate maturity for capelin. In the package we have included a three datasets to help you get started with running the maturity estimation. First of all, you need to load the data:
+```{r maturity}
+library(bifrost)
+# -- load the data --
+data(cap) # capelin abundance table
+data(catch) # capelin catch data
+data(maturityInitialParameters) # initial parameters for 1972-2019
+head(cap)
+head(catch)
+head(maturityInitialParameters)
+```
+
+Having the data loaded, we can set up the estimation procedure for the year 1985:
+```{r oneyearMaturity}
+year <- 2003
+#.. Create data list: ..
+data.list <- createMaturityData(cap = cap, 
+                                catch = catch, min_age = 3, max_age = 4, 
+                                start_year = year, end_year = year+1)
+#.. Create parameter list: ..
+par.list <- createMaturityParameters(maturityInitialParameters, 
+                                     year = year)
+#.. Estimate maturity: ..
+est <- estimateMaturity(data= data.list,
+                        parameters = par.list, silent=T)
+#.. Print estimates.. 
+est$sdrep
+```
+You can also run all years sequentially using the following function: 
+```{r runallmaturities}
+result <- runMaturityYearByYear(cap = cap, catch = catch, initPar = maturityInitialParameters,
+                                min_age = 3, max_age = 4, plot = FALSE)
+result$plot
+```
+
 ## References
 
 Put link to papers here.
+
+In the development of this package, we have used 
+
+- [TMB](https://github.com/kaskr/adcomp) - the backbone of package
+- [TMBtools](https://github.com/mlysy/TMBtools) - helpful for makin an R package with using TMB
 
 
 ## Licence

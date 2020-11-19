@@ -20,6 +20,7 @@ Imports:
     forcats,
     TMB (>= 1.7.18),
     ggplot2,
-    tidyr
+    tidyr,
+    tibble
 LinkingTo: 
     TMB
