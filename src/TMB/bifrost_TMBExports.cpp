@@ -2,12 +2,15 @@
 
 #define TMB_LIB_INIT R_init_bifrost_TMBExports
 #include <TMB.hpp>
+#include "mature.hpp"
 #include "NormalNLL.hpp"
 
 template<class Type>
 Type objective_function<Type>::operator() () {
   DATA_STRING(model);
-  if(model == "NormalNLL") {
+  if(model == "mature") {
+    return mature(this);
+  } else if(model == "NormalNLL") {
     return NormalNLL(this);
   } else {
     error("Unknown model.");

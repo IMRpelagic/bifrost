@@ -13,10 +13,13 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
+Depends: R (>= 3.5.0)
 Suggests: 
     testthat
 Imports: 
     forcats,
-    TMB (>= 1.7.18)
+    TMB (>= 1.7.18),
+    ggplot2,
+    tidyr
 LinkingTo: 
     TMB

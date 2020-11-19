@@ -1,10 +1,10 @@
 library(bifrost)
 x <- rnorm(1000)
 d
-normal_nll <- TMB::MakeADFun(data = list(model = "NormalNLL",
-                                         x = x),
-                             parameters = list(mm = 0,
-                                               ss = 1),
+obj <- TMB::MakeADFun(data = c(model = "mature",
+                                         D),
+                             parameters = parameters,
                              DLL = "bifrost_TMBExports", silent = TRUE)
+opt <- nlminb(obj$par, obj$fn, obj$gr)
 
 library(TMB)
