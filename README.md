@@ -129,8 +129,9 @@ summary(est)
 #> -------------------------------------------
 ```
 
-<img src="man/figures/README-oneyearMaturity-1.png" width="80%" /> You
-can also run all years sequentially using the following function:
+<img src="man/figures/README-oneyearMaturity-1.png" width="80%" />
+
+You can also run all years sequentially using the following function:
 
 ``` r
 result <- runMaturityYearByYear(cap = cap, catch = catch, initPar = maturityInitialParameters,

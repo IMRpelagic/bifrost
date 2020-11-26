@@ -88,6 +88,7 @@ est <- estimateMaturity(data= data.list,
 #.. Print estimates.. 
 summary(est)
 ```
+
 You can also run all years sequentially using the following function: 
 ```{r runallmaturities}
 result <- runMaturityYearByYear(cap = cap, catch = catch, initPar = maturityInitialParameters,
