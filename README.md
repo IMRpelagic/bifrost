@@ -113,19 +113,24 @@ par.list <- createMaturityParameters(maturityInitialParameters,
 est <- estimateMaturity(data= data.list,
                         parameters = par.list, silent=T)
 #.. Print estimates.. 
-est$sdrep
-#> sdreport(.) result
-#>       Estimate   Std. Error
-#> lnp1 -1.470282 1.027456e-04
-#> lnp2  2.566993 7.114205e-07
-#> lnp3 -3.233201 3.466612e-04
-#> lnnu 32.267387 3.793877e-04
-#> Warning:
-#> Hessian of fixed effects was not positive definite.
-#> Maximum gradient component: 44.01566
+summary(est)
+#>        Estimate   Std. Error  Test score p-value*
+#> p1 2.298606e-01 2.361717e-05    9732.775        0
+#> p2 1.302660e+01 9.267390e-06 1405638.524        0
+#> p3 3.943109e-02 1.366923e-05    2884.661        0
+#> nu 1.031688e+14 3.914096e+10    2635.826        0
+#> 
+#> * Using Gaussian approximation for p-values:
+#> 
+#> ------------------------------------------- 
+#> Convergence code:      0 
+#> Covergence message:    X-convergence (3) 
+#> AIC:                   -23.125 
+#> -------------------------------------------
 ```
 
-You can also run all years sequentially using the following function:
+<img src="man/figures/README-oneyearMaturity-1.png" width="80%" /> You
+can also run all years sequentially using the following function:
 
 ``` r
 result <- runMaturityYearByYear(cap = cap, catch = catch, initPar = maturityInitialParameters,

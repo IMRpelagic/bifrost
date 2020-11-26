@@ -86,7 +86,7 @@ par.list <- createMaturityParameters(maturityInitialParameters,
 est <- estimateMaturity(data= data.list,
                         parameters = par.list, silent=T)
 #.. Print estimates.. 
-est$sdrep
+summary(est)
 ```
 You can also run all years sequentially using the following function: 
 ```{r runallmaturities}
