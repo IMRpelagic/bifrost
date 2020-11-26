@@ -42,6 +42,12 @@ Capelin from the Barent Sea. Source: hi.no,  Photographer: Jan de Lange / Instit
 - [ ] Bifrost
 - [ ] Monte Carlo Simulation
 
+## TO-DO list
+
+- [ ] Make some diagnostic tools
+- [ ] Make the estimation more object oriented. Meaning: Create a class called "maturity", with standard functions for evaluating the results. 
+
+
 
 ## Install package
 
@@ -66,7 +72,7 @@ head(catch)
 head(maturityInitialParameters)
 ```
 
-Having the data loaded, we can set up the estimation procedure for the year 1985:
+Having the data loaded, we can set up the estimation procedure for the year 2003:
 ```{r oneyearMaturity}
 year <- 2003
 #.. Create data list: ..

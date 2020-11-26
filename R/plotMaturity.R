@@ -27,15 +27,15 @@ maturing = function(meanlength,p1,p2){
 #' plotMaturity(runMaturityYearByYear(cap, catch=catch,
 #' initPar =maturityInitialParameters, min_age = 3,
 #' max_age = 4, plot = FALSE))
-plotMaturity <- function(result, plot=TRUE){
-  length_l <- result$estimation[[1]]$data.list$length_l
-  meanlength <- result$estimation[[1]]$data.list$meanlength
-  p1  <- result$results$p1
-  p2  <- result$results$p2
+plotMaturity <- function(x, plot=TRUE,...){
+  length_l <- x$estimation[[1]]$data.list$length_l
+  meanlength <- x$estimation[[1]]$data.list$meanlength
+  p1  <- x$results$p1
+  p2  <- x$results$p2
   r = sapply(1:length(p1), FUN = function(x) maturing(meanlength,p1[x],p2[x]))
   r <- tibble::as_tibble(as.data.frame(t(r)))
   names(r) <- 1:length_l
-  r$year <- unlist(lapply(result$estimation, function(x)x$year))
+  r$year <- unlist(lapply(x$estimation, function(x)x$year))
   r <- tidyr::pivot_longer(r, cols = -("year"), names_to = "lengthgr", values_to = "maturity")
   r$length <- meanlength[as.integer(r$lengthgr)]
   p <- ggplot2::ggplot(r, ggplot2::aes(x = length, y = maturity, group = factor(year), col =year)) +

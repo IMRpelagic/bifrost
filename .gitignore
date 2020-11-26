@@ -6,4 +6,5 @@ src/*.o
 src/*.dll
 src/TMB/*.o
 src/TMB/*.dll
-
+*.o
+*.dll

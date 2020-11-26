@@ -113,6 +113,8 @@ Type mature(objective_function<Type>* obj) {
   ADREPORT(p2);
   ADREPORT(p3);
   ADREPORT(nu);
+  REPORT(N);
+  REPORT(simN);
   return(nll);
 }
 

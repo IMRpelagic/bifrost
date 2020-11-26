@@ -26,6 +26,13 @@ Institute of Marine Research
   - [ ] Bifrost
   - [ ] Monte Carlo Simulation
 
+## TO-DO list
+
+  - [ ] Make some diagnostic tools
+  - [ ] Make the estimation more object oriented. Meaning: Create a
+    class called “maturity”, with standard functions for evaluating the
+    results.
+
 ## Install package
 
 To install the package, run the following code:
@@ -91,7 +98,7 @@ head(maturityInitialParameters)
 ```
 
 Having the data loaded, we can set up the estimation procedure for the
-year 1985:
+year 2003:
 
 ``` r
 year <- 2003

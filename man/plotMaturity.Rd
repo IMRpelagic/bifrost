@@ -4,12 +4,12 @@
 \alias{plotMaturity}
 \title{Plot maturity for all year classes}
 \usage{
-plotMaturity(result, plot = TRUE)
+plotMaturity(x, plot = TRUE, ...)
 }
 \arguments{
-\item{result}{list, Result from runMaturityYearByYear}
-
 \item{plot}{logical, indicating whether the figure is to be printed}
+
+\item{result}{list, Result from runMaturityYearByYear}
 }
 \value{
 ggplot2 plot
