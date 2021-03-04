@@ -4,10 +4,12 @@
 \alias{summary.consumption}
 \title{Summary of estimation of Consumption}
 \usage{
-\method{summary}{consumption}(x)
+\method{summary}{consumption}(obj, ...)
 }
 \arguments{
-\item{x}{consumption, object from running estimation}
+\item{obj}{consumption, object from running estimation}
+
+\item{...}{additional arguments}
 }
 \value{
 summary

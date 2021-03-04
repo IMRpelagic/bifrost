@@ -4,12 +4,28 @@
 \alias{createMaturityParameters}
 \title{Set up parameter list for maturity}
 \usage{
-createMaturityParameters(parameter, year)
+createMaturityParameters(
+  parameter = NULL,
+  year = NULL,
+  agegr = "3-4",
+  method = "user-provided",
+  data.list = NULL,
+  init = numeric(4)
+)
 }
 \arguments{
 \item{parameter}{data.frame, initial values for p1,p2,p3 and nu by year}
 
 \item{year}{integer, year}
+
+\item{agegr}{agegroup, should either "2-3" or "3-4"}
+
+\item{method}{which method to be used for initiating parameters. Either "user-provided",
+"start-at-vec" or "grid-search".}
+
+\item{data.list}{data list, to be fed into maturity estimation}
+
+\item{init}{numeric vector of initial values. Used for method = "user-provided".}
 }
 \value{
 list, parameter object for running maturity estimation by TMB

@@ -74,19 +74,20 @@ head(maturityInitialParameters)
 
 Having the data loaded, we can set up the estimation procedure for the year 2003:
 ```{r oneyearMaturity}
-year <- 2003
+year <- 2010
 #.. Create data list: ..
-data.list <- createMaturityData(cap = cap, 
-                                catch = catch, min_age = 3, max_age = 4, 
-                                start_year = year, end_year = year+1)
-#.. Create parameter list: ..
-par.list <- createMaturityParameters(maturityInitialParameters, 
-                                     year = year)
-#.. Estimate maturity: ..
-est <- estimateMaturity(data= data.list,
-                        parameters = par.list, silent=T)
+data.list <- createMaturityData(cap,
+                                catch,
+                                min_age = 2,
+                                max_age = 3,
+                                start_year =1972,
+                                end_year = 2010)
+# ..set up parameter list..
+par.list <- createMaturityParameters(parameter = maturityInitialParameters,
+                                    year = data.list$start_year, agegr = "2-3")
+mFit <- estimateMaturity(data = data.list, parameters = par.list, silent =TRUE)
 #.. Print estimates.. 
-summary(est)
+summary(mFit)
 ```
 
 You can also run all years sequentially using the following function: 
@@ -94,8 +95,41 @@ You can also run all years sequentially using the following function:
 result <- runMaturityYearByYear(cap = cap, catch = catch, initPar = maturityInitialParameters,
                                 min_age = 3, max_age = 4, plot = FALSE)
 result$plot
-plotMaturity(result)
+plot(result)
 ```
+
+## Estimate consumption
+```{r estimateConsumption}
+data("consumptionData")
+par.list <- list(
+   logCmax   = log(1.2),
+   logChalf  = log(1e2),
+   logalpha  = log(2),
+   logbeta   = log(2),
+   logSigma  = log(1e3)
+ )
+ cFit <- estimateConsumption(data = consumptionData, parameters = par.list, silent =TRUE,
+                             map  = list(logalpha = factor(NA),
+                                         logbeta = factor(NA)))
+ cFit
+ summary(cFit)
+```
+
+
+## Run simulations
+We can run the simulation from October 1st to January 1st:
+```{r captoolSim}
+sim <- bifrost::captoolSim(mFit, nsim = 15000)
+plot(sim)
+```
+
+We can also run the full simulation until April 1st:
+```{r april}
+catches <- 1000*colSums(catch[catch$year == 2010, c("spring01", "spring05", "spring04")])
+fSim <- runFullSim(mFit, cFit, catches, nsim = 15000)
+plot(fSim)
+```
+
 
 ## References
 

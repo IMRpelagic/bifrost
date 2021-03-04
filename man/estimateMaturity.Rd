@@ -20,5 +20,21 @@ list of TMB object and optimization object
 Function for estimating maturity
 }
 \examples{
-#estMature(data = data.list, parameters = par.list, silent =TRUE)
+\dontrun{
+data(cap)
+data(catch)
+data(maturityInitialParameters)
+
+#..set up data list..
+data.list <- createMaturityData(cap,
+                                catch,
+                                min_age = 2,
+                                max_age = 3,
+                                start_year =1972,
+                                end_year = 2010)
+# ..set up parameter list..
+par.list <- createMaturityParameters(parameter = maturityInitialParameters,
+                                    year = data.list$start_year, agegr = "2-3")
+mFit <- estimateMaturity(data = data.list, parameters = par.list, silent =TRUE)
+}
 }

@@ -52,12 +52,12 @@ captoolSim <- function(fit, p = c(3.5, 13.87, 0.1),
   if(useEst) p <- fit$sumsdrep[5:7, 1]
    M2 <- (mw*maturing(ml,p[1],p[2]))%*%NumLength
   for(i in 1:nsim){
-    p2 <- rnorm(1, 13.89132, 0.074518)
-    p3 <- rnorm(1,p[3], sd = .2*p[3])
+    p2 <- stats::rnorm(1, p[1], .025*p[1])
+    p3 <- stats::rnorm(1,p[3], sd = .2*p[3])
     for(t in 1:4){
       mat[t,i] <- sum( ((mw*maturing(ml,p[1],p2))%*%NumLength )*exp(-(t-1)*(p3)) +
-                         rnorm(length(M2), mean = 0, sd = ((mw*maturing(ml,p[1],p2))%*%NumLength )*cv))
-      #mat[t,i] <- sum(rnorm(length(M2), mean = M2*exp(-(t-1)*(p3)), sd = M2*.2))
+                         stats::rnorm(length(M2), mean = 0, sd = ((mw*maturing(ml,p[1],p2))%*%NumLength )*cv))
+      #mat[t,i] <- sum(stats::rnorm(length(M2), mean = M2*exp(-(t-1)*(p3)), sd = M2*.2))
     }
   }
   return <- list()
@@ -71,11 +71,11 @@ captoolSim <- function(fit, p = c(3.5, 13.87, 0.1),
   return$simulations <- df
 
   df2<-df %>% dplyr::group_by(date) %>% dplyr::summarize(
-    q50 = median(value),
-    q75 = quantile(value, .75),
-    q95 = quantile(value, .95),
-    q25 = quantile(value, .25),
-    q05 = quantile(value, .05)) %>%
+    "q50" = stats::median(value),
+    "q75" = stats::quantile(value, .75),
+    "q95" = stats::quantile(value, .95),
+    "q25" = stats::quantile(value, .25),
+    "q05" = stats::quantile(value, .05)) %>%
     tidyr::pivot_longer(cols = 2:6,
                         names_to = "quant", values_to = "value")
   return$quantiles <- df2
@@ -85,8 +85,9 @@ captoolSim <- function(fit, p = c(3.5, 13.87, 0.1),
 
 #' Plot captool projection (1Oct - 1Jan)
 #'
-#' @param sim Simulation object (captoolSim)
+#' @param x simulation object
 #' @param all logical, if TRUE all simulations are plotted with median in red, else only quantiles.
+#' @param ... additional arguments
 #'
 #' @return ggplot object
 #' @export
@@ -95,41 +96,63 @@ captoolSim <- function(fit, p = c(3.5, 13.87, 0.1),
 #' plot(sim)
 #' plot(sim, all = TRUE)
 #' }
-plot.captoolSim <- function(sim, all = FALSE){
+plot.captoolSim <- function(x, all = FALSE, ...){
   if(!all){
-  quantwide <- tidyr::pivot_wider(sim$quantiles,
+  quantwide <- tidyr::pivot_wider(x$quantiles,
                                   id_cols = 1,
                                   names_from = "quant",
                                   values_from="value")
   print(
     ggplot2::ggplot(quantwide,
-                    ggplot2::aes(x = date, y = q50))+
-      ggplot2::geom_ribbon( ggplot2::aes(ymin = q05, ymax = q95),
+                    ggplot2::aes_string(x = "date", y = "q50"))+
+      ggplot2::geom_ribbon( ggplot2::aes_string(ymin = "q05", ymax = "q95"),
                             fill = "darkgreen")+
-      ggplot2::geom_ribbon( ggplot2::aes(ymin = q25, ymax = q75),
+      ggplot2::geom_ribbon( ggplot2::aes_string(ymin = "q25", ymax = "q75"),
                             fill = "red")+
       ggplot2::geom_line(col = "yellow", lwd = 2)+
       ggplot2::scale_y_continuous(name = "SSB",
                                   limits= c(0,max(dplyr::select(quantwide, -date))),
                                   breaks = seq(0, max(dplyr::select(quantwide,-date)), 500))+
       ggplot2::scale_x_date(breaks = seq(min(quantwide$date),
-                                              max(quantwide$date),
-                                              by = "month"))
+                                         max(quantwide$date),
+                                         by = "1 months"),
+                            date_labels = "%b-%Y")
   )
   }else{
+    quantwide <- tidyr::pivot_wider(x$quantiles,
+                                    id_cols = 1,
+                                    names_from = "quant",
+                                    values_from="value")
     print(
-       ggplot2::ggplot(sim$simulations, ggplot2::aes(x = date, y = value))+
-         ggplot2::geom_line(lty = 2, ggplot2::aes(group = sim)) +
-         ggplot2::geom_line(data = dplyr::filter(sim$quantiles, quant == "q50"),
-                   ggplot2::aes(x=date, y = value), col = "red", lwd = 2)+
+       ggplot2::ggplot(x$simulations, ggplot2::aes_string(x = "date", y = "value"))+
+         ggplot2::geom_line(lty = 2, ggplot2::aes_string(group = "sim")) +
+         ggplot2::geom_line(data = dplyr::filter(x$quantiles, quant == "q50"),
+                   ggplot2::aes_string(x="date", y = "value"), col = "red", lwd = 2)+
          ggplot2::scale_x_date(breaks = seq(min(quantwide$date),
                                             max(quantwide$date),
-                                            by = "month"))
+                                            by = "1 months"),
+                               date_labels = "%b-%Y")
     )
   }
 }
 
 
+#' Run full simulation from 1.October - 1.April
+#'
+#' @param mFit maturity fit object
+#' @param cFit consumption fit object
+#' @param catches catches data
+#' @param nsim Number of simulations
+#'
+#' @return object of type captoolSim
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' data(catch)
+#' catches <- colSums(catch[catch$year == 2010, c("spring01", "spring05", "spring04")])
+#' fSim <- runFullSim(mFit = mFit, cFit = cFit, cathces = catches, nsim = 15000)
+#' plot(fSim)}
 runFullSim <- function(mFit, cFit, catches, nsim = 15000) {
   Cmax0 <- cFit$sumsdrep["Cmax",1]
   Chalf0 <- cFit$sumsdrep["Chalf",1]
@@ -160,8 +183,8 @@ runFullSim <- function(mFit, cFit, catches, nsim = 15000) {
   }
   SSBmc.df <- as.data.frame(t(SSBmc[,1+seq(6,18,6)]))
   names(SSBmc.df)<- paste0("sim", 1:nsim)
-  SSBmc.df$date <- seq(as.Date(paste0(fit$data$end_year,"-02-01")),
-                 as.Date(paste0(fit$data$end_year,"-04-01")),
+  SSBmc.df$date <- seq(as.Date(paste0(mFit$data$end_year+1,"-02-01")),
+                 as.Date(paste0(mFit$data$end_year+1,"-04-01")),
                  by = "month")
   SSBmc.df <- tidyr::pivot_longer(SSBmc.df, cols = 1:nsim,
                             names_to = "sim", values_to = "value")
@@ -172,11 +195,11 @@ runFullSim <- function(mFit, cFit, catches, nsim = 15000) {
   return$simulations <- rbind(sim$simulations, SSBmc.df)
   return$quantiles <- rbind(sim$quantiles,
                             SSBmc.df %>% dplyr::group_by(date) %>% dplyr::summarize(
-    q50 = median(value),
-    q75 = quantile(value, .75),
-    q95 = quantile(value, .95),
-    q25 = quantile(value, .25),
-    q05 = quantile(value, .05)) %>%
+    q50 = stats::median(value),
+    q75 = stats::quantile(value, .75),
+    q95 = stats::quantile(value, .95),
+    q25 = stats::quantile(value, .25),
+    q05 = stats::quantile(value, .05)) %>%
     tidyr::pivot_longer(cols = 2:6,
                         names_to = "quant", values_to = "value")
   )

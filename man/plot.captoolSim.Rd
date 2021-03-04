@@ -4,12 +4,14 @@
 \alias{plot.captoolSim}
 \title{Plot captool projection (1Oct - 1Jan)}
 \usage{
-\method{plot}{captoolSim}(sim, all = FALSE)
+\method{plot}{captoolSim}(x, all = FALSE, ...)
 }
 \arguments{
-\item{sim}{Simulation object (captoolSim)}
+\item{x}{simulation object}
 
 \item{all}{logical, if TRUE all simulations are plotted with median in red, else only quantiles.}
+
+\item{...}{additional arguments}
 }
 \value{
 ggplot object

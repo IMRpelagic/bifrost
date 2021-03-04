@@ -29,14 +29,19 @@ age, year and the remaining 12 for each month.}
 \item{plot}{logical, print plot (TRUE or FALSE)}
 }
 \value{
-list, containing estimation output and results
+list/maturitybyyears object, containing estimation output and results
 }
 \description{
 Function for running maturity estimations year by year
 }
 \examples{
+\dontrun{
 data(cap)
 data(catch)
 data(maturityInitialParameters)
-result <- runMaturityYearByYear(cap,catch,maturityInitialParameters, plot = TRUE)
+result <- runMaturityYearByYear(cap,catch,
+                                initPar = dplyr::filter(maturityInitialParameters,
+                                                        agegr == "3-4"),
+                                plot = TRUE)
+}
 }

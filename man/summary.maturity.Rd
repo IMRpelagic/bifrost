@@ -4,10 +4,12 @@
 \alias{summary.maturity}
 \title{Summary of estimation of Maturity}
 \usage{
-\method{summary}{maturity}(x)
+\method{summary}{maturity}(obj, ...)
 }
 \arguments{
-\item{x}{maturity, object from running estimation}
+\item{obj}{maturity, object from running estimation}
+
+\item{...}{additional arguments}
 }
 \value{
 summary

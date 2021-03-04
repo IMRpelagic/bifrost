@@ -18,9 +18,11 @@ ggplot object
 Plot maturity by years
 }
 \examples{
+\dontrun{
 data(cap)
 data(catch)
 data(maturityInitialParameters)
 result <- runMaturityYearByYear(cap,catch,maturityInitialParameters, plot = TRUE)
-plot.maturitybyyears(result)
+plot(result)
+}
 }

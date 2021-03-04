@@ -4,13 +4,15 @@
 \alias{plot.consumption}
 \title{Plot consumption}
 \usage{
-\method{plot}{consumption}(x)
+\method{plot}{consumption}(x, ...)
 }
 \arguments{
 \item{x}{object of type consumption}
+
+\item{...}{additional argument}
 }
 \value{
-
+ggplot2 object
 }
 \description{
 Plot consumption

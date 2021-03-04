@@ -62,25 +62,26 @@ print.consumption <- function(x,...){
 
 #' Summary of estimation of Consumption
 #'
-#' @param x consumption, object from running estimation
+#' @param obj consumption, object from running estimation
+#' @param ... additional arguments
 #'
 #' @return summary
 #' @export
 #'
 #'
 #'
-summary.consumption <- function(x){
+summary.consumption <- function(obj, ...){
   summary.list <- list()
   class(summary.list)<-"summary.consumption"
   par.names <- c("Cmax", "Chalf", "alpha", "beta", "sigma")
-  tab <-  x$sumsdrep[par.names,]
+  tab <-  obj$sumsdrep[par.names,]
   colnames(tab) <- c("Estimate", "Std. Error", "Zscore", "p-value*")
   rownames(tab) <- par.names
   summary.list$result.tab <- tab
-  summary.list$convergence.code <- x$opt$convergence
-  summary.list$convergence.message <- x$opt$message
-  summary.list$loglikelihoodvalue <- x$opt$objective
-  summary.list$aic <- 2 * (x$opt$objective +length(x$opt$par))
+  summary.list$convergence.code <- obj$opt$convergence
+  summary.list$convergence.message <- obj$opt$message
+  summary.list$loglikelihoodvalue <- obj$opt$objective
+  summary.list$aic <- 2 * (obj$opt$objective +length(obj$opt$par))
  # summary.list$maturitytable <-tibble::tibble(
 #    ml = x$data$meanlength,
 #    r = maturing(meanlength = ml,
@@ -116,8 +117,9 @@ print.summary.consumption <- function(x,...) {
 #' Plot consumption
 #'
 #' @param x object of type consumption
+#' @param ... additional argument
 #'
-#' @return
+#' @return ggplot2 object
 #' @export
 #'
 #' @examples
@@ -135,24 +137,24 @@ print.summary.consumption <- function(x,...) {
 #'                                         logbeta = factor(NA)))
 #' plot(cFit)
 #' }
-plot.consumption <- function(x){
+plot.consumption <- function(x, ...){
   tmp <- tibble::tibble(
-    Years = as.numeric(rownames(x$data$Nco)),
-    EmpiricalConsumption = x$obj$report()$Econscolsum,
-    ModelConsumption = x$sumsdrep[rownames(x$sumsdrep) == "conscolsum",1],
-    SE = x$sumsdrep[rownames(x$sumsdrep) == "conscolsum",2],
-    low =pmax(0, ModelConsumption - 2*SE),
-    high = ModelConsumption + 2*SE
+    "Years" = as.numeric(rownames(x$data$Nco)),
+    "EmpiricalConsumption" = x$obj$report()$Econscolsum,
+    "ModelConsumption" = x$sumsdrep[rownames(x$sumsdrep) == "conscolsum",1],
+    "SE" = x$sumsdrep[rownames(x$sumsdrep) == "conscolsum",2],
+    "low" =pmax(0, ModelConsumption - 2*SE),
+    "high" = ModelConsumption + 2*SE
   )
   print(
-  ggplot2::ggplot(tmp, ggplot2::aes(x = Years,
-                                    y = ModelConsumption,
-                                    ymin = low,
-                                    ymax = high)) +
+  ggplot2::ggplot(tmp, ggplot2::aes_string(x = "Years",
+                                    y = "ModelConsumption",
+                                    ymin = "low",
+                                    ymax = "high")) +
     ggplot2::geom_ribbon(alpha = .1, fill = "blue") +
     ggplot2::geom_line(lwd = 2, col = "blue") +
-    ggplot2::geom_line(ggplot2::aes(y = EmpiricalConsumption))+
-    ggplot2::geom_point(ggplot2::aes(y = EmpiricalConsumption)) +
+    ggplot2::geom_line(ggplot2::aes_string(y = "EmpiricalConsumption"))+
+    ggplot2::geom_point(ggplot2::aes_string(y = "EmpiricalConsumption")) +
     ggplot2::scale_x_continuous(name = "Year", seq(1800,2200,2))+
     ggplot2::scale_y_continuous(name = "Total consumption of capelin by cod")
   )

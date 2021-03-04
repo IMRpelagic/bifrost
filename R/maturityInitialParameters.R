@@ -7,6 +7,7 @@
 #' @format A data frame with 47 rows and 6 variables:
 #' \describe{
 #'   \item{year}{integer, year}
+#'   \item{agegr}{character, age group. Either "2-3" or "3-4".}
 #'   \item{p1}{numeric, initial value for p1}
 #'   \item{p2}{numeric, initial value for p2}
 #'   \item{p3}{numeric, initial value for p3}
