@@ -39,8 +39,8 @@ Capelin from the Barent Sea. Source: hi.no,  Photographer: Jan de Lange / Instit
 ## Plan of development 
 
 - [x] Maturity 
-- [ ] Bifrost
-- [ ] Monte Carlo Simulation
+- [x] Bifrost
+- [x] Monte Carlo Simulation
 
 ## TO-DO list
 

@@ -23,8 +23,8 @@ Institute of Marine Research
 ## Plan of development
 
   - [x] Maturity
-  - [ ] Bifrost
-  - [ ] Monte Carlo Simulation
+  - [x] Bifrost
+  - [x] Monte Carlo Simulation
 
 ## TO-DO list
 
@@ -55,7 +55,7 @@ to load the data:
 library(bifrost)
 #> 
 #> ------------------------------------------------------------------------------
-#> * Bifrost developers: Sondre Hølleland and Samuel Subbey and others
+#> * Bifrost developers: Sondre Holleland and Samuel Subbey and others
 #> ------------------------------------------------------------------------------
 # -- load the data --
 data(cap) # capelin abundance table
