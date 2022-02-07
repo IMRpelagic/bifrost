@@ -112,7 +112,7 @@ plot.captoolSim <- function(x, all = FALSE, ...){
       ggplot2::geom_line(col = "yellow", lwd = 2)+
       ggplot2::scale_y_continuous(name = "SSB",
                                   limits= c(0,max(dplyr::select(quantwide, -date))),
-                                  breaks = seq(0, max(dplyr::select(quantwide,-date)), .5))+
+                                  breaks = seq(0, max(dplyr::select(quantwide,-date)), 500))+
       ggplot2::scale_x_date(breaks = seq(min(quantwide$date),
                                          max(quantwide$date),
                                          by = "1 months"),
