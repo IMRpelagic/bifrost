@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 # Bifrost package
-Sondre Hølleland, Mahmood Jokar, Samuel Subbey
+Sondre Hølleland, Samuel Subbey
 <!-- badges: start -->
 <!-- badges: end -->
 
@@ -35,6 +35,9 @@ This R package is a wrapper for doing capelin stock assessment.
 alt="Capelin image" width="600"/>
 
 Capelin from the Barent Sea. Source: hi.no,  Photographer: Jan de Lange / Institute of Marine Research
+
+## Documentation
+A more detailed description can be found at [https://imrpelagic.github.io/bifrostdocumentation/](https://imrpelagic.github.io/bifrostdocumentation/).
 
 
 ## Install package

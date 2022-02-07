@@ -3,7 +3,7 @@
 
 # Bifrost package
 
-Sondre Hølleland, Mahmood Jokar, Samuel Subbey <!-- badges: start -->
+Sondre Hølleland, Samuel Subbey <!-- badges: start -->
 <!-- badges: end -->
 
 *Institute of Marine Research, Norway.*
@@ -19,6 +19,11 @@ alt="Capelin image" width="600"/>
 
 Capelin from the Barent Sea. Source: hi.no, Photographer: Jan de Lange /
 Institute of Marine Research
+
+## Documentation
+
+A more detailed description can be found at
+<https://imrpelagic.github.io/bifrostdocumentation/>.
 
 ## Install package
 
