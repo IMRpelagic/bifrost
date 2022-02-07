@@ -93,7 +93,7 @@ summary(mFit)
 You can also run all years sequentially using the following function: 
 ```{r runallmaturities}
 result <- runMaturityYearByYear(cap = cap, catch = catch, initPar = maturityInitialParameters,
-                                min_age = 3, max_age = 4, plot = FALSE)
+                                min_age = 3, max_age = 4, plot = TRUE)
 result$plot
 plot(result)
 ```

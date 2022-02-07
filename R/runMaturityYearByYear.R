@@ -73,7 +73,7 @@ runMaturityYearByYear <- function(cap, catch, initPar, min_age = 3, max_age = 4,
   return.list$results <- est.pars
   class(return.list)<-c("maturitybyyears", "list")
   if(plot)
-    plot(return.list)
+    print(plot(return.list))
   return(return.list)
 }
 

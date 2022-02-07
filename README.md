@@ -22,14 +22,14 @@ Institute of Marine Research
 
 ## Plan of development
 
-  - [x] Maturity
-  - [x] Bifrost
-  - [x] Monte Carlo Simulation
+-   [x] Maturity
+-   [x] Bifrost
+-   [x] Monte Carlo Simulation
 
 ## TO-DO list
 
-  - [ ] Make some diagnostic tools
-  - [ ] Make the estimation more object oriented. Meaning: Create a
+-   [ ] Make some diagnostic tools
+-   [ ] Make the estimation more object oriented. Meaning: Create a
     class called “maturity”, with standard functions for evaluating the
     results.
 
@@ -141,13 +141,18 @@ You can also run all years sequentially using the following function:
 
 ``` r
 result <- runMaturityYearByYear(cap = cap, catch = catch, initPar = maturityInitialParameters,
-                                min_age = 3, max_age = 4, plot = FALSE)
+                                min_age = 3, max_age = 4, plot = TRUE)
+```
+
+<img src="man/figures/README-runallmaturities-1.png" width="80%" />
+
+``` r
 result$plot
 #> NULL
 plot(result)
 ```
 
-<img src="man/figures/README-runallmaturities-1.png" width="80%" />
+<img src="man/figures/README-runallmaturities-2.png" width="80%" />
 
 ## Estimate consumption
 
@@ -220,8 +225,8 @@ Put link to papers here.
 
 In the development of this package, we have used
 
-  - [TMB](https://github.com/kaskr/adcomp) - the backbone of package
-  - [TMBtools](https://github.com/mlysy/TMBtools) - helpful for makin an
+-   [TMB](https://github.com/kaskr/adcomp) - the backbone of package
+-   [TMBtools](https://github.com/mlysy/TMBtools) - helpful for makin an
     R package with using TMB
 
 ## Licence

@@ -88,9 +88,9 @@ Type mature(objective_function<Type>* obj) {
   for (a=1;a<ages;a++){
     simN(0,a)=Nimmature(0,a);
   }
-
+  for(int a = 0; a < ages-1; a++){//int a=0; // a should not be fixed
   for (i=0;i<(years-1);i++) {
-    int a=0; // a should not be fixed
+
     int d=i*ages+a;
     simNmonth(i,0)=(simN(i,a)*exp(-0.5*p3)-C(d,0))*exp(-0.5*p3);
     for (k=2;k<=3;k++) {
@@ -101,6 +101,7 @@ Type mature(objective_function<Type>* obj) {
       simNmonth(i,k-1)=(simNmonth(i,k-2)*exp(-0.5*p3)-C(d,k-1))*exp(-0.5*p3);
     }
     simN(i+1,a+1)=posfun(simNmonth(i,11),0.00005);
+  }
   }
 
   // Compute negative loglikelihood----------------------------------

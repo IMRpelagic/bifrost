@@ -5,7 +5,7 @@
 \alias{consumptionData}
 \title{Consumption data list: consumptionData}
 \format{
-A data frame with 1536 rows and 11 variables:
+A list containting the following elements:
 \describe{
   \item{Cco}{Cod consumption of capelin by year and cod age}
   \item{Nco}{Number of cod by year and age}

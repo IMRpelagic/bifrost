@@ -4,7 +4,14 @@
 \alias{runFullSim}
 \title{Run full simulation from 1.October - 1.April}
 \usage{
-runFullSim(mFit, cFit, catches, nsim = 15000)
+runFullSim(
+  mFit,
+  cFit,
+  catches,
+  nsim = 15000,
+  useEst = FALSE,
+  p = c(3.5, 13.87, 0.1)
+)
 }
 \arguments{
 \item{mFit}{maturity fit object}
@@ -14,6 +21,10 @@ runFullSim(mFit, cFit, catches, nsim = 15000)
 \item{catches}{catches data}
 
 \item{nsim}{Number of simulations}
+
+\item{useEst}{Logical, should the estimated maturity parameters be used or the default values.}
+
+\item{p}{numeric vector of length 3, p1,p2,p3 parameters.}
 }
 \value{
 object of type captoolSim

@@ -52,7 +52,7 @@ captoolSim <- function(fit, p = c(3.5, 13.87, 0.1),
   if(useEst) p <- fit$sumsdrep[5:7, 1]
    M2 <- (mw*maturing(ml,p[1],p[2]))%*%NumLength
   for(i in 1:nsim){
-    p2 <- stats::rnorm(1, p[1], .025*p[1])
+    p2 <- stats::rnorm(1, p[2], .025*p[2])
     p3 <- stats::rnorm(1,p[3], sd = .2*p[3])
     for(t in 1:4){
       mat[t,i] <- sum( ((mw*maturing(ml,p[1],p2))%*%NumLength )*exp(-(t-1)*(p3)) +
@@ -112,7 +112,7 @@ plot.captoolSim <- function(x, all = FALSE, ...){
       ggplot2::geom_line(col = "yellow", lwd = 2)+
       ggplot2::scale_y_continuous(name = "SSB",
                                   limits= c(0,max(dplyr::select(quantwide, -date))),
-                                  breaks = seq(0, max(dplyr::select(quantwide,-date)), 500))+
+                                  breaks = seq(0, max(dplyr::select(quantwide,-date)), .5))+
       ggplot2::scale_x_date(breaks = seq(min(quantwide$date),
                                          max(quantwide$date),
                                          by = "1 months"),
@@ -143,6 +143,8 @@ plot.captoolSim <- function(x, all = FALSE, ...){
 #' @param cFit consumption fit object
 #' @param catches catches data
 #' @param nsim Number of simulations
+#' @param useEst Logical, should the estimated maturity parameters be used or the default values.
+#' @param p numeric vector of length 3, p1,p2,p3 parameters.
 #'
 #' @return object of type captoolSim
 #' @export
@@ -153,13 +155,14 @@ plot.captoolSim <- function(x, all = FALSE, ...){
 #' catches <- colSums(catch[catch$year == 2010, c("spring01", "spring05", "spring04")])
 #' fSim <- runFullSim(mFit = mFit, cFit = cFit, cathces = catches, nsim = 15000)
 #' plot(fSim)}
-runFullSim <- function(mFit, cFit, catches, nsim = 15000) {
+runFullSim <- function(mFit, cFit, catches, nsim = 15000, useEst = FALSE,
+                       p = c(3.5,13.87,0.1)) {
   Cmax0 <- cFit$sumsdrep["Cmax",1]
   Chalf0 <- cFit$sumsdrep["Chalf",1]
   alpha <- cFit$sumsdrep["alpha",1]
   beta <- cFit$sumsdrep["beta",1]
   # Simulate from 1oct to 1jan:
-  sim <- captoolSim(mFit,  useEst = FALSE, nsim = nsim)
+  sim <- captoolSim(mFit,  useEst = useEst, nsim = nsim, p = p)
   # Extract SSB at 1jan:
   M <- Cod <- K <- numeric(18)
   SSBmc <- matrix(0, nrow = nsim, ncol = 19)

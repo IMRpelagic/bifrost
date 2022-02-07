@@ -4,7 +4,7 @@
 #' for cod ages 1-10 and capelin ages 1-5.
 #'
 #'
-#' @format A data frame with 1536 rows and 11 variables:
+#' @format A list containting the following elements:
 #' \describe{
 #'   \item{Cco}{Cod consumption of capelin by year and cod age}
 #'   \item{Nco}{Number of cod by year and age}

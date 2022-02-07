@@ -8,3 +8,4 @@ src/TMB/*.o
 src/TMB/*.dll
 *.o
 *.dll
+R/runSimulation_test.R
