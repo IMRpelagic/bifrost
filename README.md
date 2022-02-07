@@ -20,26 +20,13 @@ alt="Capelin image" width="600"/>
 Capelin from the Barent Sea. Source: hi.no, Photographer: Jan de Lange /
 Institute of Marine Research
 
-## Plan of development
-
--   [x] Maturity
--   [x] Bifrost
--   [x] Monte Carlo Simulation
-
-## TO-DO list
-
--   [ ] Make some diagnostic tools
--   [ ] Make the estimation more object oriented. Meaning: Create a
-    class called “maturity”, with standard functions for evaluating the
-    results.
-
 ## Install package
 
 To install the package, run the following code:
 
 ``` r
 library(devtools)
-install_github("holleland/bifrost")
+install_github("IMRpelagic/bifrost")
 ```
 
 The package uses **TMB** (Template model builder).
