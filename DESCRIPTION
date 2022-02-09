@@ -24,4 +24,5 @@ Imports:
     tibble,
     magrittr
 LinkingTo: 
-    TMB
+    TMB, 
+    RccpEigen
