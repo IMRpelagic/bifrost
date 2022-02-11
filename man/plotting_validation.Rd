@@ -19,3 +19,6 @@ ggplot figure object
 \description{
 Plotting output from captool
 }
+\examples{
+# plotting_validation()
+}

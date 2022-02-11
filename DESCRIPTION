@@ -14,15 +14,10 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
 Depends: R (>= 3.5.0)
-Suggests: 
-    testthat
-Imports: 
-    forcats,
-    TMB (>= 1.7.18),
-    ggplot2,
-    tidyr,
-    tibble,
-    magrittr
+Imports: forcats, TMB (>= 1.7.18), ggplot2, tidyr, tibble, magrittr, Rcpp,RcppEigen
 LinkingTo: 
-    TMB, 
-    RccpEigen
+    RcppEigen,
+    Rcpp,
+    TMB
+Suggests: testthat
+SystemRequirements: GNU make

@@ -6,9 +6,6 @@
 \alias{bifrost-package}
 \title{bifrost: Capelin assessment}
 \description{
-Capelin stock assessment software has historically been distributed over
-    many different platforms. This package seeks to unify and gather all in one place. 
-    One should be able to execute everything in the current assessment framework
-    from this platform..
+Capelin stock assessment software has historically been distributed over many different platforms. This package seeks to unify and gather all in one place. One should be able to execute everything in the current assessment framework from this platform..
 }
 \keyword{internal}

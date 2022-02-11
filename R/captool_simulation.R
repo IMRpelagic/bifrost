@@ -149,6 +149,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE){
 #' @export
 #'
 #' @examples
+#' # plotting_validation()
 plotting_validation <- function(return, path = "", save = FALSE){
   quantwide <- tidyr::pivot_wider(return$quantiles,
                                   id_cols = 1,
