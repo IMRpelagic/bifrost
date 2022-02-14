@@ -36,6 +36,13 @@ install_github("IMRpelagic/bifrost")
 
 The package uses **TMB** (Template model builder).
 
+For windows users, use the following code:
+
+``` r
+library(devtools)
+install_github("IMRpelagic/bifrost", INSTALL_opts = "--NO-MULTIARCH")
+```
+
 ## Maturity
 
 Here is an example to play with if you want to estimate maturity for

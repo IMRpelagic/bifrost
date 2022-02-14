@@ -50,6 +50,13 @@ install_github("IMRpelagic/bifrost")
 ```
 The package uses **TMB** (Template model builder). 
 
+For windows users, use the following code:
+```{r installwindows, eval = FALSE}
+library(devtools)
+install_github("IMRpelagic/bifrost", INSTALL_opts = "--NO-MULTIARCH")
+```
+
+
 ## Maturity 
 Here is an example to play with if you want to estimate maturity for capelin. In the package we have included a three datasets to help you get started with running the maturity estimation. First of all, you need to load the data:
 ```{r maturity}
