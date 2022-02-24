@@ -74,7 +74,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE){
   Wco <- data_list$cod1$stockW *1000
 
   catcheswithzeros <- numeric(3*6)
-  catches <-  0.205 * c(0, .3, .7)
+  # catches <-  0.205 * c(0, .3, .7)
   catcheswithzeros[seq(3,18, by  = 6)] <- data_list$catches
 
   Nco <- data_list$cod0$stock
@@ -113,6 +113,8 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE){
   SSBmc.df <- tidyr::pivot_longer(SSBmc.df, cols = 1:nsim,
                                   names_to = "sim", values_to = "value")
   return <- list()
+  return$data_list <- data_list
+  return$captooloptions <- list(nsim=nsim, cap_cv=cap_cv, cod_cv=cod_cv)
   return$simulations <- rbind(simulations, SSBmc.df)
   return$quantiles <- return$simulations %>% dplyr::group_by(date) %>% dplyr::summarize(
                               q50 = stats::median(value),
@@ -184,4 +186,65 @@ plotting_validation <- function(return, path = "", save = FALSE){
   if(save)
     ggplot2::ggsave(p,paste0(path, "/prediction_",return$year, ".tiff"), device = "tiff",
              width = 10, height = 7, dpi= "retina")
+}
+
+
+
+
+#' Function for calculating squared distance between 5% quantile and blim
+#'
+#' @param totalcatch total catch
+#' @param data_list data_list as input for captool function
+#' @param catch.distribution vector of length 3 given ratio of catch in jan, feb and mar
+#' @param blim Blim
+#' @param seed integer, for not changing the random input
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+q05ofcatch <- function(totalcatch = 0, data_list, catch.distribution = c(0, 0.3, 0.7), blim = 0.2, seed = NULL, ...){
+  if(is.null(seed))
+    warning("No seed specified")
+  data_list$catches <- catch.distribution * totalcatch
+  set.seed(seed)
+  run <- captool(data_list, plot = FALSE, ...)
+  (blim-tail(run$quanttable[,"q05"], n=1))^2
+}
+
+#' Function for setting catch, when zero catch gives prediction above blim
+#'
+#' @param captool_run output from captool function
+#' @param catchgrid grid of potential catch quotas
+#' @param catch.distribution vector of length 3 given ratio of catch in jan, feb and mar
+#' @param blim Blim
+#' @param seed integer, for not changing the random input
+#' @param ...
+#'
+#' @return captool object
+#' @export
+#'
+#' @examples
+grid.search.catch <- function(captool_run,
+                              catchgrid = seq(0,0.1,0.02),
+                              catch.distribution = c(0,0.3,0.7),
+                              blim = 0.2,seed = 1, ...){
+  dv <- sapply(catchgrid, q05ofcatch,
+               data_list =captool_run$data_list,
+               seed = seed,
+               nsim = captool_run$captooloptions$nsim,
+               cod_cv = captool_run$captooloptions$cod_cv,
+               cap_cv = captool_run$captooloptions$cap_cv)
+  plot(catchgrid, dv, xlab = "Total catch",
+       ylab = paste0("Square deviation from Blim = ", blim))
+  abline(v=catchgrid[which.min(unlist(dv))], lty = 2, col = 2)
+  abline(h=min(unlist(dv)), lty = 2, col = 2)
+
+  captool_run$data_list$catches <-catchgrid[which.min(unlist(dv))] * catch.distribution
+  run <- captool(data_list = captool_run$data_list,
+                 nsim = captool_run$captooloptions$nsim,
+                 cod_cv = captool_run$captooloptions$cod_cv,
+                 cap_cv = captool_run$captooloptions$cap_cv)
+  return(run)
 }
