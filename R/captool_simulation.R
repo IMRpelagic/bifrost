@@ -160,10 +160,10 @@ plotting_validation <- function(return, path = "", save = FALSE){
 
   # Catch-label
   catch.lab <- paste0(c(
-    paste0("Catch: ", 1000*sum(return$data_list$catches), " kt"),
-    paste0("Jan: ", 1000*return$data_list$catches[1]," kt"),
-    paste0("Feb: ", 1000*return$data_list$catches[2]," kt"),
-    paste0("Mar: ", 1000*return$data_list$catches[3]," kt")),
+    paste0("Catch: ", round(1000*sum(return$data_list$catches),1), " kt"),
+    paste0("Jan: ", round(1000*return$data_list$catches[1],1)," kt"),
+    paste0("Feb: ", round(1000*return$data_list$catches[2],1)," kt"),
+    paste0("Mar: ", round(1000*return$data_list$catches[3],1)," kt")),
     collapse = "\n" )
   p <- ggplot2::ggplot(quantwide,
                     ggplot2::aes_string(x = "date", y = "q50"))+
@@ -274,11 +274,14 @@ grid.search.catch <- function(captool_run,
     }else{
       stop("Catch routine did not converge. Try changing the catchgrid limits.")
     }
-    captool_run$data_list$catches <-opt$par * catch.distribution
+    captool_run$exact_advice <- opt$par
+    captool_run$data_list$catches <- floor(opt$par*1000)/1000 * catch.distribution
   }
   run <- captool(data_list = captool_run$data_list,
                  nsim = captool_run$captooloptions$nsim,
                  cod_cv = captool_run$captooloptions$cod_cv,
                  cap_cv = captool_run$captooloptions$cap_cv)
+  if(optimize)
+    run$exact_advice <- opt$par
   return(run)
 }
