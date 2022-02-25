@@ -8,6 +8,7 @@ grid.search.catch(
   captool_run,
   catchgrid = seq(0, 0.1, 0.02),
   catch.distribution = c(0, 0.3, 0.7),
+  optimize = TRUE,
   blim = 0.2,
   seed = 1,
   ...
@@ -16,9 +17,11 @@ grid.search.catch(
 \arguments{
 \item{captool_run}{output from captool function}
 
-\item{catchgrid}{grid of potential catch quotas}
+\item{catchgrid}{grid of potential catch quotas when optimize = FALSE, else min and max of catchgrid values are used as limits for optim.}
 
 \item{catch.distribution}{vector of length 3 given ratio of catch in jan, feb and mar}
+
+\item{optimize}{boolean, if TRUE uses optim to find exact catch}
 
 \item{blim}{Blim}
 

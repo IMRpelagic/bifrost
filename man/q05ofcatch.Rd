@@ -24,7 +24,7 @@ q05ofcatch(
 
 \item{seed}{integer, for not changing the random input}
 
-\item{...}{}
+\item{...}{other arguments to be passed to captool function}
 }
 \value{
 

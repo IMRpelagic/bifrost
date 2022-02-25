@@ -158,6 +158,13 @@ plotting_validation <- function(return, path = "", save = FALSE){
                                   names_from = "quant",
                                   values_from="value")
 
+  # Catch-label
+  catch.lab <- paste0(c(
+    paste0("Catch: ", 1000*sum(return$data_list$catches), " kt"),
+    paste0("Jan: ", 1000*return$data_list$catches[1]," kt"),
+    paste0("Feb: ", 1000*return$data_list$catches[2]," kt"),
+    paste0("Mar: ", 1000*return$data_list$catches[3]," kt")),
+    collapse = "\n" )
   p <- ggplot2::ggplot(quantwide,
                     ggplot2::aes_string(x = "date", y = "q50"))+
       ggplot2::geom_ribbon( ggplot2::aes_string(ymin = "q05", ymax = "q95"),
@@ -173,7 +180,10 @@ plotting_validation <- function(return, path = "", save = FALSE){
                                          by = "1 months"),
                             date_labels = "%b-%Y")+
     ggplot2::geom_hline(yintercept = .2)+
-    ggplot2::ggtitle(return$year)
+    ggplot2::ggtitle(return$year) +
+    ggplot2::geom_label(x= Inf, y = Inf,hjust = 1,vjust =1,
+                        label = catch.lab,
+                        label.size = NA)
   if(!is.null(return$data_list$captool)){
    p <- p +
      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "Y"), lty = 2, lwd = .9)+
@@ -198,7 +208,7 @@ plotting_validation <- function(return, path = "", save = FALSE){
 #' @param catch.distribution vector of length 3 given ratio of catch in jan, feb and mar
 #' @param blim Blim
 #' @param seed integer, for not changing the random input
-#' @param ...
+#' @param ... other arguments to be passed to captool function
 #'
 #' @return
 #' @export
@@ -216,8 +226,9 @@ q05ofcatch <- function(totalcatch = 0, data_list, catch.distribution = c(0, 0.3,
 #' Function for setting catch, when zero catch gives prediction above blim
 #'
 #' @param captool_run output from captool function
-#' @param catchgrid grid of potential catch quotas
+#' @param catchgrid grid of potential catch quotas when optimize = FALSE, else min and max of catchgrid values are used as limits for optim.
 #' @param catch.distribution vector of length 3 given ratio of catch in jan, feb and mar
+#' @param optimize boolean, if TRUE uses optim to find exact catch
 #' @param blim Blim
 #' @param seed integer, for not changing the random input
 #' @param ...
@@ -229,19 +240,42 @@ q05ofcatch <- function(totalcatch = 0, data_list, catch.distribution = c(0, 0.3,
 grid.search.catch <- function(captool_run,
                               catchgrid = seq(0,0.1,0.02),
                               catch.distribution = c(0,0.3,0.7),
+                              optimize = TRUE,
                               blim = 0.2,seed = 1, ...){
-  dv <- sapply(catchgrid, q05ofcatch,
-               data_list =captool_run$data_list,
-               seed = seed,
-               nsim = captool_run$captooloptions$nsim,
-               cod_cv = captool_run$captooloptions$cod_cv,
-               cap_cv = captool_run$captooloptions$cap_cv)
-  plot(catchgrid, dv, xlab = "Total catch",
-       ylab = paste0("Square deviation from Blim = ", blim))
-  abline(v=catchgrid[which.min(unlist(dv))], lty = 2, col = 2)
-  abline(h=min(unlist(dv)), lty = 2, col = 2)
+  if(any(catchgrid<0))
+    stop("Do not allow catches to be negative.")
+  if(!optimize){
+    dv <- sapply(catchgrid, q05ofcatch,
+                 data_list =captool_run$data_list,
+                 seed = seed,
+                 nsim = captool_run$captooloptions$nsim,
+                 cod_cv = captool_run$captooloptions$cod_cv,
+                 cap_cv = captool_run$captooloptions$cap_cv)
+    plot(catchgrid, dv, xlab = "Total catch",
+         ylab = paste0("Square deviation from Blim = ", blim))
+    abline(v=catchgrid[which.min(unlist(dv))], lty = 2, col = 2)
+    abline(h=min(unlist(dv)), lty = 2, col = 2)
 
   captool_run$data_list$catches <-catchgrid[which.min(unlist(dv))] * catch.distribution
+  }else{
+    opt <- stats::optim(par = min(catchgrid),
+                        fn = q05ofcatch,
+                        lower = min(catchgrid),
+                        upper = max(catchgrid),
+                        method = "L-BFGS-B",
+                        # Inputs to q05ofcatch:
+                        data_list =captool_run$data_list,
+                        seed = seed,
+                        nsim = captool_run$captooloptions$nsim,
+                        cod_cv = captool_run$captooloptions$cod_cv,
+                        cap_cv = captool_run$captooloptions$cap_cv)
+    if(opt$convergence==0){
+      cat("Converged with total catch: ", round(opt$par*1000,1), " kt")
+    }else{
+      stop("Catch routine did not converge. Try changing the catchgrid limits.")
+    }
+    captool_run$data_list$catches <-opt$par * catch.distribution
+  }
   run <- captool(data_list = captool_run$data_list,
                  nsim = captool_run$captooloptions$nsim,
                  cod_cv = captool_run$captooloptions$cod_cv,
