@@ -4,7 +4,7 @@
 \alias{plotting_validation}
 \title{Plotting output from captool}
 \usage{
-plotting_validation(return, path = "", save = FALSE)
+plotting_validation(return, path = "", save = FALSE, compare = FALSE)
 }
 \arguments{
 \item{return}{list, returned by captool function}
@@ -12,6 +12,8 @@ plotting_validation(return, path = "", save = FALSE)
 \item{path}{character, where to save the figure}
 
 \item{save}{boolean, should the figure be saved?}
+
+\item{compare}{compare to excel software output}
 }
 \value{
 ggplot figure object

@@ -136,6 +136,8 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE){
   return$captool$date <- return$quanttable$date
   return$captool <- return$captool[,c(7,2:6)]
   return$year = data_list$year
+  if(!is.null(data_list$spawningsurvey))
+    return$spawningsurvey = data_list$spawningsurvey
   if(plot)
     plotting_validation(return, save = FALSE)
   return(return)
@@ -146,13 +148,14 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE){
 #' @param return list, returned by captool function
 #' @param path character, where to save the figure
 #' @param save boolean, should the figure be saved?
+#' @param compare compare to excel software output
 #'
 #' @return ggplot figure object
 #' @export
 #'
 #' @examples
 #' # plotting_validation()
-plotting_validation <- function(return, path = "", save = FALSE){
+plotting_validation <- function(return, path = "", save = FALSE, compare = FALSE){
   quantwide <- tidyr::pivot_wider(return$quantiles,
                                   id_cols = 1,
                                   names_from = "quant",
@@ -184,7 +187,7 @@ plotting_validation <- function(return, path = "", save = FALSE){
     ggplot2::geom_label(x= Inf, y = Inf,hjust = 1,vjust =1,
                         label = catch.lab,
                         label.size = NA)
-  if(!is.null(return$data_list$captool)){
+  if(!is.null(return$data_list$captool) & compare){
    p <- p +
      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "Y"), lty = 2, lwd = .9)+
      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y+1`"), lty = 2, lwd = .9)+
@@ -192,10 +195,22 @@ plotting_validation <- function(return, path = "", save = FALSE){
      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y-1`"), lty = 2, lwd = .9)+
      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y-2`"), lty = 2, lwd = .9)
   }
+  if(!is.null(return$data_list$spawningsurvey)){
+    tmp <- tibble(
+      x = as.Date(paste0(max(lubridate::year(quantwide$date)),"-03-12")),
+      y = return$data_list$spawningsurvey[2],
+      ymin=return$data_list$spawningsurvey[1],
+      ymax=return$data_list$spawningsurvey[3])
+    p <- p +
+       ggplot2::geom_point(data = tmp, ggplot2::aes(x=x, y = y), col = "skyblue", size = 5) +
+       ggplot2::geom_errorbar(data =tmp,
+                              ggplot2::aes(x=x, y = y, ymin = ymin, ymax = ymax), col = "skyblue", width = 10, lwd = 1.2)
+  }
   print(p)
   if(save)
     ggplot2::ggsave(p,paste0(path, "/prediction_",return$year, ".tiff"), device = "tiff",
              width = 10, height = 7, dpi= "retina")
+  return(p)
 }
 
 

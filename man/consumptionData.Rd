@@ -7,15 +7,15 @@
 \format{
 A list containting the following elements:
 \describe{
-  \item{Cco}{Cod consumption of capelin by year and cod age}
-  \item{Nco}{Number of cod by year and age}
+  \item{Cco}{Empirical cod consumption of capelin by year and cod age }
+  \item{Nco}{Number of cod by year and age (in 10 billions)}
   \item{Oco}{Proportion of mature cod by year and age}
   \item{SV}{Proportion of cod in Svalbard region}
-  \item{Wco}{Mean weight of cod by year and age}
+  \item{Wco}{Mean weight of cod by year and age (in grams)}
   \item{Fco}{Fishing mortiality of cod by year and age}
   \item{Mco}{Natural mortality of cod by year and age}
-  \item{Nmc}{Number of capelin by year and age}
-  \item{Wmc}{Mean weight of capelin by year and age}
+  \item{Nmc}{Number of capelin by year and age (in 10 billions)}
+  \item{Wmc}{Mean weight of capelin by year and age (in grams)}
   \item{p3}{Total moratility rate of capelin from 1Oct - 1Nov by year}
 }
 }
