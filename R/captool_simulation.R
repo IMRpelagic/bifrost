@@ -9,6 +9,7 @@
 #' @param cap_cv capelin coefficient of variation (cv)
 #' @param cod_cv cod coefficient of variation (cv)
 #' @param plot boolean, should the projection be plotted?
+#' @param consumControl numeric vector of length 18 of 0s or 1s.See details.
 #'
 #' @details
 #' The 'data_list' should contain year, cap, catches, cod0, cod1, svalbard,
@@ -25,6 +26,12 @@
 #' projected quantiles from captool as an argument at these will be added to the
 #' figure showing the projection.
 #'
+#' The input vector consumControl should be of length 18 containing 0s and 1s
+#' to control when the consum should begin or end. The period 1.january to
+#' 1.april is divided into 18 parts; 6 per month. E.g.
+#' consumControl = c(rep(0,6), rep(1,12)) would make the consum by cod start
+#' on Feburary 1st.
+#'
 #'
 #' @return list of output from the projection.
 #' @export
@@ -32,12 +39,15 @@
 #' @examples
 #' # captool(data_list)
 #'
-captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE){
+captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
+                    consumControl = rep(1,18)){
   if(!all(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory") %in% names(data_list)))
     stop("The following is missing from the data_list object: \n",
          paste(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory")[which(
            !(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory") %in%
                names(data_list)))], collapse = ", "))
+  if(length(consumControl)!=18 | !is.numeric(consumControl))
+    stop("consumControl must be numeric of length 18." )
   #nsim=5e4; cap_cv=0.2; cod_cv=0.3
   cind1 <- sample(1:nrow(data_list$stochasticHistory), nsim, replace=T)
   cind2 <- sample(1:ncol(data_list$stochasticHistory[,-(1:10)]), nsim, replace=T)
@@ -97,7 +107,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE){
 
     for(t in 1:18){
       K[t] <- Cmax0/6 * predability[t] * SSBmc[i,t] / (Chalf0 + SSBmc[i,t])
-      M[t] <- -log(1-K[t]/SSBmc[i,t])
+      M[t] <- -log(1-K[t]/SSBmc[i,t]) * consumControl[t]
       SSBmc[i,t+1] <- SSBmc[i,t] * (exp(-M[t])) - catcheswithzeros[t]
     }
   }

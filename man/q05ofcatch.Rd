@@ -26,9 +26,6 @@ q05ofcatch(
 
 \item{...}{other arguments to be passed to captool function}
 }
-\value{
-
-}
 \description{
 Function for calculating squared distance between 5% quantile and blim
 }

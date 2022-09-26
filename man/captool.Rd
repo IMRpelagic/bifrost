@@ -4,7 +4,14 @@
 \alias{captool}
 \title{Function for running CAPTOOL projection}
 \usage{
-captool(data_list, nsim = 50000, cap_cv = 0.2, cod_cv = 0.3, plot = TRUE)
+captool(
+  data_list,
+  nsim = 50000,
+  cap_cv = 0.2,
+  cod_cv = 0.3,
+  plot = TRUE,
+  consumControl = rep(1, 18)
+)
 }
 \arguments{
 \item{data_list}{list of data input (see details)}
@@ -16,6 +23,8 @@ captool(data_list, nsim = 50000, cap_cv = 0.2, cod_cv = 0.3, plot = TRUE)
 \item{cod_cv}{cod coefficient of variation (cv)}
 
 \item{plot}{boolean, should the projection be plotted?}
+
+\item{consumControl}{numeric vector of length 18 of 0s or 1s.See details.}
 }
 \value{
 list of output from the projection.
@@ -38,6 +47,12 @@ M = natural mortality) and Cmax and Chalf. Lastly, if comparion to
 captool (the excel-based software) is to be made, one can also provide the
 projected quantiles from captool as an argument at these will be added to the
 figure showing the projection.
+
+The input vector consumControl should be of length 18 containing 0s and 1s
+to control when the consum should begin or end. The period 1.january to
+1.april is divided into 18 parts; 6 per month. E.g.
+consumControl = c(rep(0,6), rep(1,12)) would make the consum by cod start
+on Feburary 1st.
 }
 \examples{
 # captool(data_list)
