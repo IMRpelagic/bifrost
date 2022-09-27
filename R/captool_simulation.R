@@ -57,14 +57,15 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   mw <- as.numeric(unlist(data_list$cap[,7]))
   ml <- as.numeric(unlist(data_list$cap[,9]))
   mat <- matrix(0, ncol = nsim, nrow = 4)
+  p3 <- numeric(nsim)
   for(i in 1:nsim){
     p1 <- unlist(data_list$stochasticHistory$capelinP1)[cind1[i]]
     p2 <- unlist(data_list$stochasticHistory$capelinP2)[cind1[i]]
-    p3 <- unlist(data_list$stochasticHistory[cind1[i],10+cind2[i]])
+    p3[i] <- unlist(data_list$stochasticHistory[cind1[i],10+cind2[i]])
     M2 <- (mw*bifrost::maturing(ml, p1, p2))%*%  naa
     mat[1,i] <-sum( M2* stats::rnorm(length(M2), mean = 1, sd = cap_cv))
     for(t in 2:4){
-      mat[t,i] <- mat[t-1,i] * exp(-p3)
+      mat[t,i] <- mat[t-1,i] * exp(-p3[i])
     }
   }
   simulations <- as.data.frame(mat)
@@ -107,7 +108,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
 
     for(t in 1:18){
       K[t] <- Cmax0/6 * predability[t] * SSBmc[i,t] / (Chalf0 + SSBmc[i,t])
-      M[t] <- -log(1-K[t]/SSBmc[i,t]) * consumControl[t]
+      M[t] <- ifelse(consumControl[t]==1, -log(1-K[t]/SSBmc[i,t]), p3[i]/6)
       SSBmc[i,t+1] <- SSBmc[i,t] * (exp(-M[t])) - catcheswithzeros[t]
     }
   }
