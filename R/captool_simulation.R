@@ -48,6 +48,8 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
                names(data_list)))], collapse = ", "))
   if(length(consumControl)!=18 | !is.numeric(consumControl))
     stop("consumControl must be numeric of length 18." )
+  if(is.null(data_list$scaling.factors)) data_list$scaling.factors <- 1
+  if(length(data_list$scaling.factors)==1) data_list$scaling.factors <- rep(data_list$scaling.factors,2)
   #nsim=5e4; cap_cv=0.2; cod_cv=0.3
   cind1 <- sample(1:nrow(data_list$stochasticHistory), nsim, replace=T)
   cind2 <- sample(1:ncol(data_list$stochasticHistory[,-(1:10)]), nsim, replace=T)
@@ -62,7 +64,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
     p1 <- unlist(data_list$stochasticHistory$capelinP1)[cind1[i]]
     p2 <- unlist(data_list$stochasticHistory$capelinP2)[cind1[i]]
     p3[i] <- unlist(data_list$stochasticHistory[cind1[i],10+cind2[i]])
-    M2 <- (mw*bifrost::maturing(ml, p1, p2))%*%  naa
+    M2 <- (mw*bifrost::maturing(ml, p1, p2))%*%  naa * sample(x=data_list$scaling.factors, size = 1)
     mat[1,i] <-sum( M2* stats::rnorm(length(M2), mean = 1, sd = cap_cv))
     for(t in 2:4){
       mat[t,i] <- mat[t-1,i] * exp(-p3[i])
@@ -147,6 +149,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   return$captool$date <- return$quanttable$date
   return$captool <- return$captool[,c(7,2:6)]
   return$year = data_list$year
+  return$scaling.factors = scaling.factors
   if(!is.null(data_list$spawningsurvey))
     return$spawningsurvey = data_list$spawningsurvey
   if(plot)
