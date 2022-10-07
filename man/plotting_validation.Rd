@@ -22,5 +22,5 @@ ggplot figure object
 Plotting output from captool
 }
 \examples{
-# plotting_validation()
+\dontrun{plotting_validation(run)}
 }

@@ -53,6 +53,13 @@ to control when the consum should begin or end. The period 1.january to
 1.april is divided into 18 parts; 6 per month. E.g.
 consumControl = c(rep(0,6), rep(1,12)) would make the consum by cod start
 on Feburary 1st.
+
+In 2022 the Russian part of the survey was not conducted. Hence we included
+the option to scale up the abundance of capelin in october by some scaling
+factors based on the historical distribution of capelin in russian economic
+zone relative to the Norwegian part. The simulation procedure will sample a
+scaling factor from data_list$scaling.factors with equal probability in each
+simulation.
 }
 \examples{
 # captool(data_list)

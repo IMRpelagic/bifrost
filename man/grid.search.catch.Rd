@@ -35,3 +35,6 @@ captool object
 \description{
 Function for setting catch, when zero catch gives prediction above blim
 }
+\examples{
+\dontrun{opt <- grid.search.catch(run)}
+}

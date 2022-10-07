@@ -32,6 +32,13 @@
 #' consumControl = c(rep(0,6), rep(1,12)) would make the consum by cod start
 #' on Feburary 1st.
 #'
+#' In 2022 the Russian part of the survey was not conducted. Hence we included
+#' the option to scale up the abundance of capelin in october by some scaling
+#' factors based on the historical distribution of capelin in russian economic
+#' zone relative to the Norwegian part. The simulation procedure will sample a
+#' scaling factor from data_list$scaling.factors with equal probability in each
+#' simulation.
+#'
 #'
 #' @return list of output from the projection.
 #' @export
@@ -168,7 +175,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
 #' @export
 #'
 #' @examples
-#' # plotting_validation()
+#' \dontrun{plotting_validation(run)}
 plotting_validation <- function(return, path = "", save = FALSE, compare = FALSE){
   quantwide <- tidyr::pivot_wider(return$quantiles,
                                   id_cols = 1,
@@ -239,10 +246,9 @@ plotting_validation <- function(return, path = "", save = FALSE, compare = FALSE
 #' @param seed integer, for not changing the random input
 #' @param ... other arguments to be passed to captool function
 #'
-#' @return
+#' @return squared distance from q05 to blim
 #' @export
 #'
-#' @examples
 q05ofcatch <- function(totalcatch = 0, data_list, catch.distribution = c(0, 0.3, 0.7), blim = 0.2, seed = NULL, ...){
   if(is.null(seed))
     warning("No seed specified")
@@ -266,6 +272,7 @@ q05ofcatch <- function(totalcatch = 0, data_list, catch.distribution = c(0, 0.3,
 #' @export
 #'
 #' @examples
+#' \dontrun{opt <- grid.search.catch(run)}
 grid.search.catch <- function(captool_run,
                               catchgrid = seq(0,0.1,0.02),
                               catch.distribution = c(0,0.3,0.7),
