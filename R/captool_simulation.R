@@ -56,7 +56,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   if(length(consumControl)!=18 | !is.numeric(consumControl))
     stop("consumControl must be numeric of length 18." )
   if(is.null(data_list$scaling.factors)) data_list$scaling.factors <- 1
-  if(length(data_list$scaling.factors)==1) data_list$scaling.factors <- rep(data_list$scaling.factors,2)
+  if(length( data_list$scaling.factors)==1) data_list$scaling.factors <- rep(data_list$scaling.factors,2)
   #nsim=5e4; cap_cv=0.2; cod_cv=0.3
   cind1 <- sample(1:nrow(data_list$stochasticHistory), nsim, replace=T)
   cind2 <- sample(1:ncol(data_list$stochasticHistory[,-(1:10)]), nsim, replace=T)
@@ -156,7 +156,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   return$captool$date <- return$quanttable$date
   return$captool <- return$captool[,c(7,2:6)]
   return$year = data_list$year
-  return$scaling.factors = scaling.factors
+  return$scaling.factors = data_list$scaling.factors
   if(!is.null(data_list$spawningsurvey))
     return$spawningsurvey = data_list$spawningsurvey
   if(plot)
