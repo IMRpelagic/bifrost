@@ -10,7 +10,8 @@ captool(
   cap_cv = 0.2,
   cod_cv = 0.3,
   plot = TRUE,
-  consumControl = rep(1, 18)
+  consumControl = rep(1, 18),
+  NewFallMortality = NULL
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ captool(
 \item{plot}{boolean, should the projection be plotted?}
 
 \item{consumControl}{numeric vector of length 18 of 0s or 1s.See details.}
+
+\item{NewFallMortality}{numeric vector of historical fall mortality per month.}
 }
 \value{
 list of output from the projection.

@@ -10,6 +10,7 @@
 #' @param cod_cv cod coefficient of variation (cv)
 #' @param plot boolean, should the projection be plotted?
 #' @param consumControl numeric vector of length 18 of 0s or 1s.See details.
+#' @param NewFallMortality numeric vector of historical fall mortality per month.
 #'
 #' @details
 #' The 'data_list' should contain year, cap, catches, cod0, cod1, svalbard,
@@ -47,7 +48,8 @@
 #' # captool(data_list)
 #'
 captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
-                    consumControl = rep(1,18)){
+                    consumControl = rep(1,18),
+                    NewFallMortality = NULL){
   if(!all(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory") %in% names(data_list)))
     stop("The following is missing from the data_list object: \n",
          paste(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory")[which(
@@ -55,22 +57,29 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
                names(data_list)))], collapse = ", "))
   if(length(consumControl)!=18 | !is.numeric(consumControl))
     stop("consumControl must be numeric of length 18." )
+  if(!(length(cap_cv) %in% c(1,5)))
+    warning("cap_cv should be a vector of length 1 or 5.")
   if(is.null(data_list$scaling.factors)) data_list$scaling.factors <- 1
   if(length( data_list$scaling.factors)==1) data_list$scaling.factors <- rep(data_list$scaling.factors,2)
   #nsim=5e4; cap_cv=0.2; cod_cv=0.3
   cind1 <- sample(1:nrow(data_list$stochasticHistory), nsim, replace=T)
-  cind2 <- sample(1:ncol(data_list$stochasticHistory[,-(1:10)]), nsim, replace=T)
-
+  #
+  if(is.null(NewFallMortality)){
+    cind2 <- sample(1:ncol(data_list$stochasticHistory[,-(1:10)]), nsim, replace=T)
+    p3 <- numeric(nsim)
+  }else{
+    p3 <- sample(NewFallMortality, nsim, replace = T)
+  }
   # --- 1oct - 1jan ----
   naa <- as.matrix(data_list$cap[,2:6])
   mw <- as.numeric(unlist(data_list$cap[,7]))
   ml <- as.numeric(unlist(data_list$cap[,9]))
   mat <- matrix(0, ncol = nsim, nrow = 4)
-  p3 <- numeric(nsim)
   for(i in 1:nsim){
     p1 <- unlist(data_list$stochasticHistory$capelinP1)[cind1[i]]
     p2 <- unlist(data_list$stochasticHistory$capelinP2)[cind1[i]]
-    p3[i] <- unlist(data_list$stochasticHistory[cind1[i],10+cind2[i]])
+    if(is.null(NewFallMortality))
+      p3[i] <- unlist(data_list$stochasticHistory[cind1[i],10+cind2[i]])
     M2 <- (mw*bifrost::maturing(ml, p1, p2))%*%  naa * sample(x=data_list$scaling.factors, size = 1)
     mat[1,i] <-sum( M2* stats::rnorm(length(M2), mean = 1, sd = cap_cv))
     for(t in 2:4){
