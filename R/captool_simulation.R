@@ -11,6 +11,7 @@
 #' @param plot boolean, should the projection be plotted?
 #' @param consumControl numeric vector of length 18 of 0s or 1s.See details.
 #' @param NewFallMortality numeric vector of historical fall mortality per month.
+#' @param epsilon Lower limit of SSB. Should be below Blim and non-negative
 #'
 #' @details
 #' The 'data_list' should contain year, cap, catches, cod0, cod1, svalbard,
@@ -49,7 +50,8 @@
 #'
 captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
                     consumControl = rep(1,18),
-                    NewFallMortality = NULL){
+                    NewFallMortality = NULL,
+                    epsilon = 0){
   if(!all(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory") %in% names(data_list)))
     stop("The following is missing from the data_list object: \n",
          paste(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory")[which(
@@ -59,8 +61,10 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
     stop("consumControl must be numeric of length 18." )
   if(!(length(cap_cv) %in% c(1,5)))
     warning("cap_cv should be a vector of length 1 or 5.")
+  if(epsilon <0) warning("epsilon should be non-negative and ideally lower than Blim.")
   if(is.null(data_list$scaling.factors)) data_list$scaling.factors <- 1
   if(length( data_list$scaling.factors)==1) data_list$scaling.factors <- rep(data_list$scaling.factors,2)
+
   #nsim=5e4; cap_cv=0.2; cod_cv=0.3
   cind1 <- sample(1:nrow(data_list$stochasticHistory), nsim, replace=T)
   #
@@ -89,9 +93,9 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   simulations <- as.data.frame(mat)
   names(simulations)<- paste0("sim", 1:nsim)
   simulations$date <- as.Date(paste(data_list$year+c(0,0,0,1), c(10:12, "01"),
-                           "01", sep = "-"))
+                                    "01", sep = "-"))
   simulations <- tidyr::pivot_longer(simulations, cols = 1:nsim,
-                            names_to = "sim", values_to = "value")
+                                     names_to = "sim", values_to = "value")
 
   # Extract SSB at 1jan:
   M <- Cod <- K <- pred <- numeric(18)
@@ -120,14 +124,18 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
     NY[2:3] <- data_list$cod1$stock[1:2]
     Nco.sample <- NY[-1]
     predability <- rep(c(sum(Nco.sample * CodSuit *(1 - SV)*(1-Oco)*(Wco/1000)^(0.801)*exp(- (1-0.5) * Zco)),
-                    sum(Nco.sample * CodSuit *(1 - SV)*(1-Oco)*(Wco/1000)^(0.801)*exp(- (2-0.5) * Zco)),
-                    sum(Nco.sample * CodSuit *(1 - SV)*(1-Oco)*(Wco/1000)^(0.801)*exp(- (3-0.5) * Zco))),
-               each = 6)
+                         sum(Nco.sample * CodSuit *(1 - SV)*(1-Oco)*(Wco/1000)^(0.801)*exp(- (2-0.5) * Zco)),
+                         sum(Nco.sample * CodSuit *(1 - SV)*(1-Oco)*(Wco/1000)^(0.801)*exp(- (3-0.5) * Zco))),
+                       each = 6)
 
     for(t in 1:18){
       K[t] <- Cmax0/6 * predability[t] * SSBmc[i,t] / (Chalf0 + SSBmc[i,t])
       M[t] <- ifelse(consumControl[t]==1, -log(1-K[t]/SSBmc[i,t]), p3[i]/6)
       SSBmc[i,t+1] <- SSBmc[i,t] * (exp(-M[t])) - catcheswithzeros[t]
+      if(SSBmc[i,t+1]<epsilon){
+        SSBmc[i,(t+1):18]<- epsilon
+        break
+      }
     }
   }
   #plot(pred,Cod/6)
@@ -146,13 +154,13 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   return$captooloptions <- list(nsim=nsim, cap_cv=cap_cv, cod_cv=cod_cv)
   return$simulations <- rbind(simulations, SSBmc.df)
   return$quantiles <- return$simulations %>% dplyr::group_by(date) %>% dplyr::summarize(
-                              q50 = stats::median(value),
-                              q75 = stats::quantile(value, .75),
-                              q95 = stats::quantile(value, .95),
-                              q25 = stats::quantile(value, .25),
-                              q05 = stats::quantile(value, .05)) %>%
-                              tidyr::pivot_longer(cols = 2:6,
-                                                  names_to = "quant", values_to = "value")
+    q50 = stats::median(value),
+    q75 = stats::quantile(value, .75),
+    q95 = stats::quantile(value, .95),
+    q25 = stats::quantile(value, .25),
+    q05 = stats::quantile(value, .05)) %>%
+    tidyr::pivot_longer(cols = 2:6,
+                        names_to = "quant", values_to = "value")
 
   attr(return, "class") <- c("captoolSim","list")
   return$quanttable <- return$simulations %>% dplyr::group_by(date) %>% dplyr::summarize(
@@ -199,31 +207,31 @@ plotting_validation <- function(return, path = "", save = FALSE, compare = FALSE
     paste0("Mar: ", round(1000*return$data_list$catches[3],1)," kt")),
     collapse = "\n" )
   p <- ggplot2::ggplot(quantwide,
-                    ggplot2::aes_string(x = "date", y = "q50"))+
-      ggplot2::geom_ribbon( ggplot2::aes_string(ymin = "q05", ymax = "q95"),
-                            fill = "darkgreen")+
-      ggplot2::geom_ribbon( ggplot2::aes_string(ymin = "q25", ymax = "q75"),
-                            fill = "red")+
-      ggplot2::geom_line(col = "yellow", lwd = 2)+
-      ggplot2::scale_y_continuous(name = "SSB",
-                                  limits= c(0,1.05*max(dplyr::select(quantwide, -date), return$captool[,-1])),
-                                  breaks = seq(0, 1.05*max(dplyr::select(quantwide,-date)), .1))+
-      ggplot2::scale_x_date(breaks = seq(min(quantwide$date),
-                                         max(quantwide$date),
-                                         by = "1 months"),
-                            date_labels = "%b-%Y")+
+                       ggplot2::aes_string(x = "date", y = "q50"))+
+    ggplot2::geom_ribbon( ggplot2::aes_string(ymin = "q05", ymax = "q95"),
+                          fill = "darkgreen")+
+    ggplot2::geom_ribbon( ggplot2::aes_string(ymin = "q25", ymax = "q75"),
+                          fill = "red")+
+    ggplot2::geom_line(col = "yellow", lwd = 2)+
+    ggplot2::scale_y_continuous(name = "SSB",
+                                limits= c(0,1.05*max(dplyr::select(quantwide, -date), return$captool[,-1])),
+                                breaks = seq(0, 1.05*max(dplyr::select(quantwide,-date)), .1))+
+    ggplot2::scale_x_date(breaks = seq(min(quantwide$date),
+                                       max(quantwide$date),
+                                       by = "1 months"),
+                          date_labels = "%b-%Y")+
     ggplot2::geom_hline(yintercept = .2)+
     ggplot2::ggtitle(return$year) +
     ggplot2::geom_label(x= Inf, y = Inf,hjust = 1,vjust =1,
                         label = catch.lab,
                         label.size = NA)
   if(!is.null(return$data_list$captool) & compare){
-   p <- p +
-     ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "Y"), lty = 2, lwd = .9)+
-     ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y+1`"), lty = 2, lwd = .9)+
-     ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y+2`"), lty = 2, lwd = .9)+
-     ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y-1`"), lty = 2, lwd = .9)+
-     ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y-2`"), lty = 2, lwd = .9)
+    p <- p +
+      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "Y"), lty = 2, lwd = .9)+
+      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y+1`"), lty = 2, lwd = .9)+
+      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y+2`"), lty = 2, lwd = .9)+
+      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y-1`"), lty = 2, lwd = .9)+
+      ggplot2::geom_line(data=return$captool, ggplot2::aes_string(x = "date", y = "`Y-2`"), lty = 2, lwd = .9)
   }
   if(!is.null(return$data_list$spawningsurvey)){
     tmp <- tibble(
@@ -232,14 +240,14 @@ plotting_validation <- function(return, path = "", save = FALSE, compare = FALSE
       ymin=return$data_list$spawningsurvey[1],
       ymax=return$data_list$spawningsurvey[3])
     p <- p +
-       ggplot2::geom_point(data = tmp, ggplot2::aes(x=x, y = y), col = "skyblue", size = 5) +
-       ggplot2::geom_errorbar(data =tmp,
-                              ggplot2::aes(x=x, y = y, ymin = ymin, ymax = ymax), col = "skyblue", width = 10, lwd = 1.2)
+      ggplot2::geom_point(data = tmp, ggplot2::aes(x=x, y = y), col = "skyblue", size = 5) +
+      ggplot2::geom_errorbar(data =tmp,
+                             ggplot2::aes(x=x, y = y, ymin = ymin, ymax = ymax), col = "skyblue", width = 10, lwd = 1.2)
   }
   print(p)
   if(save)
     ggplot2::ggsave(p,paste0(path, "/prediction_",return$year, ".tiff"), device = "tiff",
-             width = 10, height = 7, dpi= "retina")
+                    width = 10, height = 7, dpi= "retina")
   return(p)
 }
 
@@ -301,7 +309,7 @@ grid.search.catch <- function(captool_run,
     abline(v=catchgrid[which.min(unlist(dv))], lty = 2, col = 2)
     abline(h=min(unlist(dv)), lty = 2, col = 2)
 
-  captool_run$data_list$catches <-catchgrid[which.min(unlist(dv))] * catch.distribution
+    captool_run$data_list$catches <-catchgrid[which.min(unlist(dv))] * catch.distribution
   }else{
     opt <- stats::optim(par = min(catchgrid),
                         fn = q05ofcatch,
