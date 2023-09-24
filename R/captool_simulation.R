@@ -11,7 +11,7 @@
 #' @param plot boolean, should the projection be plotted?
 #' @param consumControl numeric vector of length 18 of 0s or 1s.See details.
 #' @param NewFallMortality numeric vector of historical fall mortality per month.
-#' @param epsilon Lower limit of SSB. Should be below Blim and non-negative
+#' @param epsilon Lower limit of SSB. Should be below Blim and non-negative. Default 0.
 #'
 #' @details
 #' The 'data_list' should contain year, cap, catches, cod0, cod1, svalbard,

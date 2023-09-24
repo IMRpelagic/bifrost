@@ -11,7 +11,8 @@ captool(
   cod_cv = 0.3,
   plot = TRUE,
   consumControl = rep(1, 18),
-  NewFallMortality = NULL
+  NewFallMortality = NULL,
+  epsilon = 0
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ captool(
 \item{consumControl}{numeric vector of length 18 of 0s or 1s.See details.}
 
 \item{NewFallMortality}{numeric vector of historical fall mortality per month.}
+
+\item{epsilon}{Lower limit of SSB. Should be below Blim and non-negative. Default 0.}
 }
 \value{
 list of output from the projection.
