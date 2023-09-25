@@ -11,7 +11,6 @@
 #' @param plot boolean, should the projection be plotted?
 #' @param consumControl numeric vector of length 18 of 0s or 1s.See details.
 #' @param NewFallMortality numeric vector of historical fall mortality per month.
-#' @param epsilon Lower limit of SSB. Should be below Blim and non-negative. Default 0.
 #'
 #' @details
 #' The 'data_list' should contain year, cap, catches, cod0, cod1, svalbard,
@@ -50,8 +49,7 @@
 #'
 captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
                     consumControl = rep(1,18),
-                    NewFallMortality = NULL,
-                    epsilon = 0){
+                    NewFallMortality = NULL){
   if(!all(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory") %in% names(data_list)))
     stop("The following is missing from the data_list object: \n",
          paste(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory")[which(
@@ -130,12 +128,16 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
 
     for(t in 1:18){
       K[t] <- Cmax0/6 * predability[t] * SSBmc[i,t] / (Chalf0 + SSBmc[i,t])
-      M[t] <- ifelse(consumControl[t]==1, -log(1-K[t]/SSBmc[i,t]), p3[i]/6)
-      SSBmc[i,t+1] <- SSBmc[i,t] * (exp(-M[t])) - catcheswithzeros[t]
-      if(SSBmc[i,t+1]<=epsilon){
-        SSBmc[i,(t+1):18]<- epsilon
+      if(K[t]>= SSBmc[i,t]){
+        SSBmc[i,(t+1):18]<- 0
         break
       }
+      M[t] <- ifelse(consumControl[t]==1, -log(1-K[t]/SSBmc[i,t]), p3[i]/6)
+      SSBmc[i,t+1] <- SSBmc[i,t] * (exp(-M[t])) - catcheswithzeros[t]
+      # if(SSBmc[i,t+1]<=epsilon){
+      #   SSBmc[i,(t+1):18]<- epsilon
+      #   break
+      # }
     }
   }
   #plot(pred,Cod/6)
