@@ -132,7 +132,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
       K[t] <- Cmax0/6 * predability[t] * SSBmc[i,t] / (Chalf0 + SSBmc[i,t])
       M[t] <- ifelse(consumControl[t]==1, -log(1-K[t]/SSBmc[i,t]), p3[i]/6)
       SSBmc[i,t+1] <- SSBmc[i,t] * (exp(-M[t])) - catcheswithzeros[t]
-      if(SSBmc[i,t+1]<epsilon){
+      if(SSBmc[i,t+1]<=epsilon){
         SSBmc[i,(t+1):18]<- epsilon
         break
       }
