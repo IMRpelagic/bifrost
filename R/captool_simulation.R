@@ -59,7 +59,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
     stop("consumControl must be numeric of length 18." )
   if(!(length(cap_cv) %in% c(1,5)))
     warning("cap_cv should be a vector of length 1 or 5.")
-  if(epsilon <0) warning("epsilon should be non-negative and ideally lower than Blim.")
+  #if(epsilon <0) warning("epsilon should be non-negative and ideally lower than Blim.")
   if(is.null(data_list$scaling.factors)) data_list$scaling.factors <- 1
   if(length( data_list$scaling.factors)==1) data_list$scaling.factors <- rep(data_list$scaling.factors,2)
 
