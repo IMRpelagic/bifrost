@@ -128,16 +128,13 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
 
     for(t in 1:18){
       K[t] <- Cmax0/6 * predability[t] * SSBmc[i,t] / (Chalf0 + SSBmc[i,t])
-      if(K[t]>= SSBmc[i,t]){
-        SSBmc[i,(t+1):18]<- 0
+      if(K[t]>= SSBmc[i,t] | SSBmc[i,t] <0){
+        SSBmc[i,(t+1):18] <- 0
+        SSBmc[i,t] <- max(SSBmc[i,t], 0)
         break
       }
       M[t] <- ifelse(consumControl[t]==1, -log(1-K[t]/SSBmc[i,t]), p3[i]/6)
       SSBmc[i,t+1] <- SSBmc[i,t] * (exp(-M[t])) - catcheswithzeros[t]
-      # if(SSBmc[i,t+1]<=epsilon){
-      #   SSBmc[i,(t+1):18]<- epsilon
-      #   break
-      # }
     }
   }
   #plot(pred,Cod/6)
