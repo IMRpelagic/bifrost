@@ -27,7 +27,7 @@ grid.search.catch(
 
 \item{seed}{integer, for not changing the random input}
 
-\item{...}{}
+\item{...}{other arguments for the optimization to captool function. E.g. NewFallMortality}
 }
 \value{
 captool object

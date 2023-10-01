@@ -10,7 +10,6 @@
 #' @param cod_cv cod coefficient of variation (cv)
 #' @param plot boolean, should the projection be plotted?
 #' @param consumControl numeric vector of length 18 of 0s or 1s.See details.
-#' @param NewFallMortality numeric vector of historical fall mortality per month.
 #'
 #' @details
 #' The 'data_list' should contain year, cap, catches, cod0, cod1, svalbard,
@@ -25,7 +24,10 @@
 #' M = natural mortality) and Cmax and Chalf. Lastly, if comparion to
 #' captool (the excel-based software) is to be made, one can also provide the
 #' projected quantiles from captool as an argument at these will be added to the
-#' figure showing the projection.
+#' figure showing the projection. There is also a option to include a vector of
+#' new fall mortalities in the data_list called 'NewFallMortality'. If this is
+#' present in the list, these will be used. Otherwise, the routine will look for
+#' autumn mortalities in the stochastic history part.
 #'
 #' The input vector consumControl should be of length 18 containing 0s and 1s
 #' to control when the consum should begin or end. The period 1.january to
@@ -48,8 +50,7 @@
 #' # captool(data_list)
 #'
 captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
-                    consumControl = rep(1,18),
-                    NewFallMortality = NULL){
+                    consumControl = rep(1,18)){
   if(!all(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory") %in% names(data_list)))
     stop("The following is missing from the data_list object: \n",
          paste(c("year", "cap", "catches", "cod0", "cod1", "svalbard", "stochasticHistory")[which(
@@ -66,11 +67,11 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   #nsim=5e4; cap_cv=0.2; cod_cv=0.3
   cind1 <- sample(1:nrow(data_list$stochasticHistory), nsim, replace=T)
   #
-  if(is.null(NewFallMortality)){
+  if(is.null(data_list$NewFallMortality)){
     cind2 <- sample(1:ncol(data_list$stochasticHistory[,-(1:10)]), nsim, replace=T)
     p3 <- numeric(nsim)
   }else{
-    p3 <- sample(NewFallMortality, nsim, replace = T)
+    p3 <- sample(data_list$NewFallMortality, nsim, replace = T)
   }
   # --- 1oct - 1jan ----
   naa <- as.matrix(data_list$cap[,2:6])
@@ -80,7 +81,7 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   for(i in 1:nsim){
     p1 <- unlist(data_list$stochasticHistory$capelinP1)[cind1[i]]
     p2 <- unlist(data_list$stochasticHistory$capelinP2)[cind1[i]]
-    if(is.null(NewFallMortality))
+    if(is.null(data_list$NewFallMortality))
       p3[i] <- unlist(data_list$stochasticHistory[cind1[i],10+cind2[i]])
     M2 <- (mw*bifrost::maturing(ml, p1, p2))%*%  naa * sample(x=data_list$scaling.factors, size = 1)
     mat[1,i] <-sum( M2* stats::rnorm(length(M2), mean = 1, sd = cap_cv))
@@ -282,7 +283,7 @@ q05ofcatch <- function(totalcatch = 0, data_list, catch.distribution = c(0, 0.3,
 #' @param optimize boolean, if TRUE uses optim to find exact catch
 #' @param blim Blim
 #' @param seed integer, for not changing the random input
-#' @param ...
+#' @param ... other arguments for the optimization to captool function. E.g. NewFallMortality
 #'
 #' @return captool object
 #' @export
@@ -302,7 +303,8 @@ grid.search.catch <- function(captool_run,
                  seed = seed,
                  nsim = captool_run$captooloptions$nsim,
                  cod_cv = captool_run$captooloptions$cod_cv,
-                 cap_cv = captool_run$captooloptions$cap_cv)
+                 cap_cv = captool_run$captooloptions$cap_cv,
+                 ...)
     plot(catchgrid, dv, xlab = "Total catch",
          ylab = paste0("Square deviation from Blim = ", blim))
     abline(v=catchgrid[which.min(unlist(dv))], lty = 2, col = 2)
@@ -320,7 +322,8 @@ grid.search.catch <- function(captool_run,
                         seed = seed,
                         nsim = captool_run$captooloptions$nsim,
                         cod_cv = captool_run$captooloptions$cod_cv,
-                        cap_cv = captool_run$captooloptions$cap_cv)
+                        cap_cv = captool_run$captooloptions$cap_cv,
+                        ...)
     if(opt$convergence==0){
       cat("Converged with total catch: ", round(opt$par*1000,1), " kt")
     }else{
@@ -332,7 +335,8 @@ grid.search.catch <- function(captool_run,
   run <- captool(data_list = captool_run$data_list,
                  nsim = captool_run$captooloptions$nsim,
                  cod_cv = captool_run$captooloptions$cod_cv,
-                 cap_cv = captool_run$captooloptions$cap_cv)
+                 cap_cv = captool_run$captooloptions$cap_cv,
+                 ...)
   if(optimize)
     run$exact_advice <- opt$par
   return(run)

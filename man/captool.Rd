@@ -10,8 +10,7 @@ captool(
   cap_cv = 0.2,
   cod_cv = 0.3,
   plot = TRUE,
-  consumControl = rep(1, 18),
-  NewFallMortality = NULL
+  consumControl = rep(1, 18)
 )
 }
 \arguments{
@@ -26,8 +25,6 @@ captool(
 \item{plot}{boolean, should the projection be plotted?}
 
 \item{consumControl}{numeric vector of length 18 of 0s or 1s.See details.}
-
-\item{NewFallMortality}{numeric vector of historical fall mortality per month.}
 }
 \value{
 list of output from the projection.
@@ -49,7 +46,10 @@ historical samples of parameters we are to sample from, i.e. p1, p2, p3 (p3 =
 M = natural mortality) and Cmax and Chalf. Lastly, if comparion to
 captool (the excel-based software) is to be made, one can also provide the
 projected quantiles from captool as an argument at these will be added to the
-figure showing the projection.
+figure showing the projection. There is also a option to include a vector of
+new fall mortalities in the data_list called 'NewFallMortality'. If this is
+present in the list, these will be used. Otherwise, the routine will look for
+autumn mortalities in the stochastic history part.
 
 The input vector consumControl should be of length 18 containing 0s and 1s
 to control when the consum should begin or end. The period 1.january to
