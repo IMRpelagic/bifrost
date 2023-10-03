@@ -63,6 +63,11 @@ factors based on the historical distribution of capelin in russian economic
 zone relative to the Norwegian part. The simulation procedure will sample a
 scaling factor from data_list$scaling.factors with equal probability in each
 simulation.
+
+In the recent Benchmark, it is stated that; "Predation ability is assumed
+unchanged during the period January-March – previously M and F were
+applied monthly to reduce abundance – now mortality and growth are assumed
+to cancel out." To run the old version include 'data_list$useCodM = TRUE'.
 }
 \examples{
 # captool(data_list)

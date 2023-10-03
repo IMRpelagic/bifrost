@@ -42,6 +42,11 @@
 #' scaling factor from data_list$scaling.factors with equal probability in each
 #' simulation.
 #'
+#' In the recent Benchmark, it is stated that; "Predation ability is assumed
+#' unchanged during the period January-March – previously M and F were
+#' applied monthly to reduce abundance – now mortality and growth are assumed
+#' to cancel out." To run the old version include 'data_list$useCodM = TRUE'.
+#'
 #'
 #' @return list of output from the projection.
 #' @export
@@ -63,9 +68,10 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   #if(epsilon <0) warning("epsilon should be non-negative and ideally lower than Blim.")
   if(is.null(data_list$scaling.factors)) data_list$scaling.factors <- 1
   if(length( data_list$scaling.factors)==1) data_list$scaling.factors <- rep(data_list$scaling.factors,2)
-
+  if(is.null(data_list$useCodM)) data_list$useCodM <- FALSE
   #nsim=5e4; cap_cv=0.2; cod_cv=0.3
   cind1 <- sample(1:nrow(data_list$stochasticHistory), nsim, replace=T)
+  svind <- sample(1:ncol(data_list$svalbard), nsim, replace = T)
   #
   if(is.null(data_list$NewFallMortality)){
     cind2 <- sample(1:ncol(data_list$stochasticHistory[,-(1:10)]), nsim, replace=T)
@@ -97,10 +103,10 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
                                      names_to = "sim", values_to = "value")
 
   # Extract SSB at 1jan:
-  M <- Cod <- K <- pred <- numeric(18)
-  SSBmc <- matrix(0, nrow = nsim, ncol = 19)
+  Cod <- pred <- numeric(18)
+  K <- matrix(0, nrow = nsim, ncol = 18)
+   SSBmc <- matrix(0, nrow = nsim, ncol = 19)
   SSBmc[,1] <- simulations[lubridate::year(simulations$date) == data_list$year+1,]$value
-  Zco <- (data_list$cod1$Fmult*data_list$cod1$exploit + data_list$cod1$M)/12
   CodSuit <- data_list$cod1$suit
   Oco <- data_list$cod1$maturity
   Wco <- data_list$cod1$stockW *1000
@@ -109,33 +115,50 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
   # catches <-  0.205 * c(0, .3, .7)
   catcheswithzeros[seq(3,18, by  = 6)] <- data_list$catches
 
-  Nco <- data_list$cod0$stock
+  if(data_list$useCodM){
+    Nco <- data_list$cod0$stock
+    Zco <- (data_list$cod1$Fmult*data_list$cod1$exploit + data_list$cod1$M)/12
+  }else{
+    Nco <- data_list$cod1$stock
+    Zco <-0
+  }
+
 
   for(i in 1:nsim){
     Cmax0 <- data_list$stochasticHistory$maxCons[cind1[i]]
     Chalf0 <- data_list$stochasticHistory$halfConsBiomass[cind1[i]]#sample(halfConsCandidates, size = 1)
     SV <- unlist(data_list$svalbard[,sample(1:ncol(data_list$svalbard), size = 1)])
     nn <- length(Nco)
-    NY <- rep(NA, nn)
-    N <- Nco * c(1,1,rlnorm(n = nn-2, meanlog = log(1/sqrt(1+cod_cv^2)), sqrt(log(1+cod_cv^2))))
-    NY[-1] <- N[-nn] * exp(-(data_list$cod0$M[-nn] +data_list$cod0$exploit[-nn]*data_list$cod0$Fmult[-nn]))
-    NY[nn] <- NY[nn] +  N[nn] * exp(-(data_list$cod0$M[nn] +data_list$cod0$exploit[nn]*data_list$cod0$Fmult[nn]))
-    NY[2:3] <- data_list$cod1$stock[1:2]
-    Nco.sample <- NY[-1]
+    if(data_list$useCodM){
+      NY <- rep(NA, nn)
+      N <- Nco * c(1,1,rlnorm(n = nn-2, meanlog = log(1/sqrt(1+cod_cv^2)), sqrt(log(1+cod_cv^2))))
+      NY[-1] <- N[-nn] * exp(-(data_list$cod0$M[-nn] +data_list$cod0$exploit[-nn]*data_list$cod0$Fmult[-nn]))
+      NY[nn] <- NY[nn] +  N[nn] * exp(-(data_list$cod0$M[nn] +data_list$cod0$exploit[nn]*data_list$cod0$Fmult[nn]))
+      NY[2:3] <- data_list$cod1$stock[1:2]
+      Nco.sample <- NY[-1]
+    }else{
+      Nco.sample <- Nco * c(1,1,rlnorm(n = nn-2, meanlog = log(1/sqrt(1+cod_cv^2)), sqrt(log(1+cod_cv^2))))
+    }
     predability <- rep(c(sum(Nco.sample * CodSuit *(1 - SV)*(1-Oco)*(Wco/1000)^(0.801)*exp(- (1-0.5) * Zco)),
                          sum(Nco.sample * CodSuit *(1 - SV)*(1-Oco)*(Wco/1000)^(0.801)*exp(- (2-0.5) * Zco)),
                          sum(Nco.sample * CodSuit *(1 - SV)*(1-Oco)*(Wco/1000)^(0.801)*exp(- (3-0.5) * Zco))),
                        each = 6)
 
     for(t in 1:18){
-      K[t] <- Cmax0/6 * predability[t] * SSBmc[i,t] / (Chalf0 + SSBmc[i,t])
-      if(K[t]>= SSBmc[i,t] | SSBmc[i,t] <0){
+      if(data_list$consumptionType == 3){
+        K[i,t] <- Cmax0/6 * predability[t] * SSBmc[i,t]^2 / (Chalf0 + SSBmc[i,t]^2)
+      } else{
+        K[i,t] <- Cmax0/6 * predability[t] * SSBmc[i,t] / (Chalf0 + SSBmc[i,t])
+      }
+      if(K[i,t]>= SSBmc[i,t] | SSBmc[i,t] <0){
         SSBmc[i,(t+1):18] <- 0
         SSBmc[i,t] <- max(SSBmc[i,t], 0)
+        #print("breaking out")
         break
       }
-      M[t] <- ifelse(consumControl[t]==1, -log(1-K[t]/SSBmc[i,t]), p3[i]/6)
-      SSBmc[i,t+1] <- SSBmc[i,t] * (exp(-M[t])) - catcheswithzeros[t]
+      #M[i,t] <- ifelse(consumControl[t]==1, -log(1-K[i,t]/SSBmc[i,t]), p3[i]/6)
+      #SSBmc[i,t+1] <- SSBmc[i,t] * (exp(-M[t])) - catcheswithzeros[t]
+      SSBmc[i,t+1] <- SSBmc[i,t] - K[i,t] - catcheswithzeros[t]
     }
   }
   #plot(pred,Cod/6)
