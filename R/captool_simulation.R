@@ -192,9 +192,11 @@ captool <- function(data_list, nsim=5e4, cap_cv=0.2, cod_cv=0.3, plot = TRUE,
     q95 = stats::quantile(value, .95),
     q25 = stats::quantile(value, .25),
     q05 = stats::quantile(value, .05))
-  return$captool <- data_list$captool
-  return$captool$date <- return$quanttable$date
-  return$captool <- return$captool[,c(7,2:6)]
+  if(!is.null(data_list$captool)){
+    return$captool <- data_list$captool
+    return$captool$date <- return$quanttable$date
+    return$captool <- return$captool[,c(7,2:6)]
+  }
   return$year = data_list$year
   return$scaling.factors = data_list$scaling.factors
   if(!is.null(data_list$spawningsurvey))
@@ -229,6 +231,7 @@ plotting_validation <- function(return, path = "", save = FALSE, compare = FALSE
     paste0("Feb: ", round(1000*return$data_list$catches[2],1)," kt"),
     paste0("Mar: ", round(1000*return$data_list$catches[3],1)," kt")),
     collapse = "\n" )
+  capmax <- ifelse(!is.null(return$captool), 0, max(return$captool[,-1]))
   p <- ggplot2::ggplot(quantwide,
                        ggplot2::aes_string(x = "date", y = "q50"))+
     ggplot2::geom_ribbon( ggplot2::aes_string(ymin = "q05", ymax = "q95"),
@@ -237,7 +240,7 @@ plotting_validation <- function(return, path = "", save = FALSE, compare = FALSE
                           fill = "red")+
     ggplot2::geom_line(col = "yellow", lwd = 2)+
     ggplot2::scale_y_continuous(name = "SSB",
-                                limits= c(0,1.05*max(dplyr::select(quantwide, -date), return$captool[,-1])),
+                                limits= c(0,1.05*max(dplyr::select(quantwide, -date), capmax)),
                                 breaks = seq(0, 1.05*max(dplyr::select(quantwide,-date)), .1))+
     ggplot2::scale_x_date(breaks = seq(min(quantwide$date),
                                        max(quantwide$date),
